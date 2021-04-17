@@ -161,17 +161,10 @@ Parameters:
   DBUser:
     Type: String
     Description: mssql username
-    Default: dbuser
+    Default: dbadmin
   DBName:
     Type: String
     Default: employees
-  DBInstanceName:
-    Type: String
-    Description: MUST be unique in your acct  
-  DBUser:
-    Type: String
-    Description: mssql username
-    Default: dbuser
   DBStorage:
     Type: String
     Description: mssql db storage in GB
@@ -379,7 +372,7 @@ Resources:
         DBPassword:
           Ref: DomainAdminPassword
         DBUser:
-          Ref: dbadmin
+          Ref: DBUser
         DBStorage:
           Ref: DBStorage
         PrivSG:
