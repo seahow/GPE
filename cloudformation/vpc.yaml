@@ -43,7 +43,7 @@ Mappings:
       "AzApublic": "172.17.10.0/27"
       "AzAPriv": "172.17.10.32/27"
       "AzBPublic": "172.17.10.160/27"
-      "AzBPriv": "172.17.19.192/27"
+      "AzBPriv": "172.17.10.192/27"
       "AzADirectory": "172.17.10.96/27"
       "AzBDirectory": "172.17.10.128/27"
   PlMap:
