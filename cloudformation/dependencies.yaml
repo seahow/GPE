@@ -353,7 +353,7 @@ Resources:
           Fn::GetAtt:
             - VPC
             - Outputs.aPriv
-        PrivateSubnet1:
+        PrivateSubnet2:
           Fn::GetAtt:
             - VPC
             - Outputs.bPriv
