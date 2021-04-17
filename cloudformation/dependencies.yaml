@@ -345,10 +345,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        VpcId:
-          Fn::GetAtt:
-            - VPC
-            - Outputs.vpc
         PrivateSubnet1:
           Fn::GetAtt:
             - VPC
@@ -357,10 +353,6 @@ Resources:
           Fn::GetAtt:
             - VPC
             - Outputs.bPriv
-        DomainAdminPassword:
-          Ref: DomainAdminPassword
-        KeyName:
-          Ref: KeyName
         EnvironmentTag:
           Ref: EnvironmentTag
         DBInstanceClass:
