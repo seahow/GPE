@@ -28,7 +28,7 @@ Parameters:
     Default: "100"
     Description: Storage Size of MSSQL RDS Instance in GB
     Type: String
-  PrivSG:
+  PrivateSG:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Private SG
   PrivateSubnet1:
@@ -84,8 +84,6 @@ Resources:
       Iops: 5000
       DBInstanceClass:
         Ref: DBInstanceClass
-      DBInstanceIdentifier:
-        Ref: DBInstanceName
       DBSubnetGroupName:
         Ref: myDBSubnetGroup
       Engine:

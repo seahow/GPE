@@ -366,7 +366,7 @@ Resources:
         Domain:
           Ref: ADService
         EngineVersion: 15.00.4073.23.v1 | MSSQL Server 2019
-        PrivSG:
+        PrivateSG:
           Fn::GetAtt:
             - VPC
             - Outputs.Privsg
