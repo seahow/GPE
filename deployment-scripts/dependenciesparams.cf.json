@@ -5,6 +5,10 @@
             "ParameterValue": "NAMESALTPLACEHOLDER"
         },
         {
+            "ParameterKey": "BaseCIDR",
+            "ParameterValue": "BASECIDRPLACEHOLDER"
+        },
+        {
             "ParameterKey": "DBInstanceClass",
             "ParameterValue": "DBINSTANCECLASSPLACEHOLDER"
         },

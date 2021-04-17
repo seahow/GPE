@@ -122,7 +122,7 @@ Parameters:
     ConstraintDescription: Must choose a /24 from this list (it will be carved up into multiple /27s)
     AllowedValues:
       - 192.168.10.0
-      - 172.17.0.0
+      - 172.17.10.0
     Default: 192.168.10.0
   DomainAdminPassword:
     Type: String

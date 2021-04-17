@@ -30,8 +30,11 @@
 #
 # --s = database storage size in GB.  Default = 100GB
 #
+# --x = CIDR BASE /24.  Choose 192.168.10.0 or 172.17.10.0 for a base VPC CIDR block of that as a /24.  All subnets carved out will be /27s
+#       [default: 192.168.10.0/24]
+#
 # ./pushdependencies.sh --r us-west-2 --c "GPE v1.0" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n LAB --o allow --s 300
-# ./pushdependencies.sh --r us-east-1 --c "GPE v1.0" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n LAB --o allow --s 250
+# ./pushdependencies.sh --r us-east-1 --c "GPE v1.0" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n LAB --o allow --s 250 --x 172.17.10.0
 
 FILEBASE="../"
 S3BUCKET="centralsa-labs"
@@ -50,6 +53,7 @@ n=${n:-LAB}
 o=${o:-suppress}
 u=${u:-dbadmin}
 s=${s:-100}
+x=${x:-192.168.10.0}
 
 while [ $# -gt 0 ]; do
 
@@ -62,7 +66,7 @@ while [ $# -gt 0 ]; do
 done
 
 RANDNAME=$(openssl rand -hex 1 | tr [:lower:] [:upper:])
-JSON=$(cat dependenciesparams.cf.json | sed "s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g; s/DBINSTANCECLASSPLACEHOLDER/db.r5b.xlarge/g; s/DBPASSWORDPLACEHOLDER/Aws2020@/g; s/DBUSERPLACEHOLDER/$u/g; s/DBSTORAGEPLACEHOLDER/$s/g")
+JSON=$(cat dependenciesparams.cf.json | sed "s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/BASECIDRPLACEHOLDER/$x/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g; s/DBINSTANCECLASSPLACEHOLDER/db.r5b.xlarge/g; s/DBPASSWORDPLACEHOLDER/Aws2020@/g; s/DBUSERPLACEHOLDER/$u/g; s/DBSTORAGEPLACEHOLDER/$s/g")
 
 if [[ $o == "suppress" ]]; then
      aws cloudformation create-stack --capabilities "CAPABILITY_NAMED_IAM" "CAPABILITY_IAM" --tags Key="comment",Value="$c" --stack-name "$n-GPE-$RANDNAME" --cli-input-json "$JSON" --region $r --template-url https://s3.amazonaws.com/$S3BUCKET/$S3PREFIX/cloudformation/dependencies.yaml --profile=shared >>./mylog.log
