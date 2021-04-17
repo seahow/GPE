@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: GPE v1.0 - RDP-based MSSQL 2019 Multi-AZ
 Parameters:
+  Domain:
+    Type: String
   DBInstanceClass:
     Default: db.r5b.xlarge
     Description: Instance type
@@ -102,6 +104,8 @@ Resources:
       PubliclyAccessible: True
       StorageEncrypted: False
       StorageType: io1
+      Domain:
+        Ref: Domain
       VPCSecurityGroups:
         - Ref: PrivateSG
       MultiAZ: true

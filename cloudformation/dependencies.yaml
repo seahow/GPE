@@ -345,8 +345,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        BaseStackName:
-          Ref: AWS::StackName
         VpcId:
           Fn::GetAtt:
             - VPC
@@ -361,8 +359,6 @@ Resources:
             - Outputs.bPriv
         DomainAdminPassword:
           Ref: DomainAdminPassword
-        DomainDNSName:
-          Ref: DomainDNSName
         KeyName:
           Ref: KeyName
         EnvironmentTag:
@@ -375,6 +371,8 @@ Resources:
           Ref: DBUser
         DBStorage:
           Ref: DBStorage
+        Domain:
+          Ref: ADService
         PrivSG:
           Fn::GetAtt:
             - VPC
