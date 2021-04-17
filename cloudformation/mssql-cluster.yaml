@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: GPE v1.0 - RDP-based MSSQL 2019 Multi-AZ
+Parameters:
+  DBInstanceClass:
+    Default: db.r5b.xlarge
+    Description: Instance type
+    Type: String
+  DBPassword:
+    ConstraintDescription: must contain only alphanumeric characters.
+    Default: Aws2020@
+    Description: The database admin account password
+    NoEcho: "true"
+    Type: String
+  DBUser:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription:
+      must begin with a letter and contain only alphanumeric
+      characters.
+    Default: sqluser
+    Description: The database admin account username
+    MaxLength: "16"
+    MinLength: "1"
+    NoEcho: "true"
+    Type: String
+  DBStorage:
+    Default: "100"
+    Description: Storage Size of MSSQL RDS Instance in GB
+    Type: String
+  PrivSG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Private SG
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private SubnetId 1
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private SubnetId 2
+  MSSQLEdition:
+    AllowedValues:
+      - sqlserver-ee
+      - sqlserver-se
+      - sqlserver-ex
+      - sqlserver-web
+    Default: sqlserver-ee
+    Description: The MSSQL edition.
+    Type: String
+  EngineVersion:
+    Type: String
+    AllowedValues:
+      - 15.00.4073.23.v1 | MSSQL Server 2019
+      - 14.00.3356.20.v1 | MSSQL Server 2017
+      - 12.00.6329.1.v1  | MSSQL Server 2014
+      - 11.00.7493.4.v1  | MSSQL Server 2012
+    Default: 15.00.4073.23.v1
+  EnvironmentTag:
+    Description: Select to identify use case of this environment - this is helpful for reporting
+    Type: String
+    Default: "SelfStudy"
+    AllowedValues:
+      - "ProblemRepro"
+      - "ClassroomTraining"
+      - "SelfStudy"
+      - "Development"
+Resources:
+  OptionGroup:
+    Type: AWS::RDS::OptionGroup
+    Properties:
+      EngineName: sqlserver-ee
+      MajorEngineVersion: 15
+      OptionGroupDescription: OptionGroup
+      OptionConfigurations:
+        - OptionName: Mirroring
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      AllocatedStorage:
+        Ref: DBStorage
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      BackupRetentionPeriod: "3"
+      Iops: 5000
+      DBInstanceClass:
+        Ref: DBInstanceClass
+      DBInstanceIdentifier:
+        Ref: DBInstanceName
+      DBSubnetGroupName:
+        Ref: myDBSubnetGroup
+      Engine:
+        Ref: MSSQLEdition
+      EngineVersion:
+        Ref: EngineVersion
+      LicenseModel: license-included
+      MasterUsername:
+        Ref: DBUser
+      MasterUserPassword:
+        Ref: DBPassword
+      OptionGroupName:
+        Ref: OptionGroup
+      PreferredBackupWindow: 01:00-03:00
+      PreferredMaintenanceWindow: sun:06:00-sun:06:30
+      PubliclyAccessible: True
+      StorageEncrypted: False
+      StorageType: io1
+      VPCSecurityGroups:
+        - Ref: PrivateSG
+      MultiAZ: true
+  myDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: DB Subnet Group
+      SubnetIds:
+        - Ref: PrivateSubnet1
+        - Ref: PrivateSubnet2
+Outputs:
+  mssqlurl:
+    Description: Output MSSQL Endpoint
+    Value:
+      Fn::GetAtt:
+        - DBInstance
+        - Endpoint.Address

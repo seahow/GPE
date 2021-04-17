@@ -1,0 +1,922 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RTSZDocument>
+  <RoyalDocument>
+    <ID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ID>
+    <Modified>04/01/2021 16:28:36.601</Modified>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <Name>Lab</Name>
+    <Created>05/06/2020 21:32:09.287</Created>
+    <CreatedBy>EXAMPLE\Admin</CreatedBy>
+    <PositionNr>0</PositionNr>
+    <IsExpanded>True</IsExpanded>
+    <FileName>C:\Users\Admin\Documents\Lab.rtsz</FileName>
+    <AutoSaveAfterChange>False</AutoSaveAfterChange>
+    <AutoSaveOnClose>True</AutoSaveOnClose>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>00000000-0000-0000-0000-000000000000</CredentialId>
+    <CredentialMode>0</CredentialMode>
+    <CustomField10FromParent>False</CustomField10FromParent>
+    <CustomField11FromParent>False</CustomField11FromParent>
+    <CustomField12FromParent>False</CustomField12FromParent>
+    <CustomField13FromParent>False</CustomField13FromParent>
+    <CustomField14FromParent>False</CustomField14FromParent>
+    <CustomField15FromParent>False</CustomField15FromParent>
+    <CustomField16FromParent>False</CustomField16FromParent>
+    <CustomField17FromParent>False</CustomField17FromParent>
+    <CustomField18FromParent>False</CustomField18FromParent>
+    <CustomField19FromParent>False</CustomField19FromParent>
+    <CustomField1FromParent>False</CustomField1FromParent>
+    <CustomField20FromParent>False</CustomField20FromParent>
+    <CustomField2FromParent>False</CustomField2FromParent>
+    <CustomField3FromParent>False</CustomField3FromParent>
+    <CustomField4FromParent>False</CustomField4FromParent>
+    <CustomField5FromParent>False</CustomField5FromParent>
+    <CustomField6FromParent>False</CustomField6FromParent>
+    <CustomField7FromParent>False</CustomField7FromParent>
+    <CustomField8FromParent>False</CustomField8FromParent>
+    <CustomField9FromParent>False</CustomField9FromParent>
+    <CustomImageList>{}</CustomImageList>
+    <CustomPropertiesFromParent>False</CustomPropertiesFromParent>
+    <DeletedObjectHistory>3da0abda-e156-4b84-9054-51f9e996c06b;a4089b7f-5bd9-4e07-a49b-08d81d15bd05</DeletedObjectHistory>
+    <DeletedObjectRetention>30</DeletedObjectRetention>
+    <DocumentType>Workspace</DocumentType>
+    <KeySequenceEnabled>False</KeySequenceEnabled>
+    <KeySequenceFromParent>False</KeySequenceFromParent>
+    <LockdownFeaturesInUse>{}</LockdownFeaturesInUse>
+    <ManagementEndpointFromParent>False</ManagementEndpointFromParent>
+    <ManagementEndpointID>00000000-0000-0000-0000-000000000000</ManagementEndpointID>
+    <Notes>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+	&lt;head&gt;
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;&lt;title&gt;
+		&lt;/title&gt;
+		&lt;style type="text/css"&gt;
+			.cs2654AE3A{text-align:left;text-indent:0pt;margin:0pt 0pt 0pt 0pt}
+			.csC8F6D76{color:#000000;background-color:transparent;font-family:Calibri;font-size:11pt;font-weight:normal;font-style:normal;}
+		&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;p class="cs2654AE3A"&gt;&lt;span class="csC8F6D76"&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;
+&lt;/html&gt;
+    </Notes>
+    <NotesFromParent>False</NotesFromParent>
+    <PostDisconnectTaskConditionLast>False</PostDisconnectTaskConditionLast>
+    <PostDisconnectTaskFromParent>False</PostDisconnectTaskFromParent>
+    <PostDisconnectTaskId>00000000-0000-0000-0000-000000000000</PostDisconnectTaskId>
+    <PostDisconnectTaskMode>1</PostDisconnectTaskMode>
+    <PostDisconnectTaskWait>False</PostDisconnectTaskWait>
+    <PreConnectTaskConditionAbort>False</PreConnectTaskConditionAbort>
+    <PreConnectTaskConditionFirst>False</PreConnectTaskConditionFirst>
+    <PreConnectTaskFromParent>False</PreConnectTaskFromParent>
+    <PreConnectTaskId>00000000-0000-0000-0000-000000000000</PreConnectTaskId>
+    <PreConnectTaskMode>1</PreConnectTaskMode>
+    <PreConnectTaskWait>False</PreConnectTaskWait>
+    <RDSGatewayFromParent>False</RDSGatewayFromParent>
+    <RDSGatewayID>00000000-0000-0000-0000-000000000000</RDSGatewayID>
+    <RDSGatewayUsageMode>0</RDSGatewayUsageMode>
+    <SaveOption>1</SaveOption>
+    <SecureGatewayFromParent>False</SecureGatewayFromParent>
+    <SecureGatewayID>00000000-0000-0000-0000-000000000000</SecureGatewayID>
+    <SecureGatewayUsageMode>0</SecureGatewayUsageMode>
+    <StoreFavoritesInUserConfig>False</StoreFavoritesInUserConfig>
+    <StoreFolderExpandStateInUserConfig>False</StoreFolderExpandStateInUserConfig>
+    <Color />
+    <CustomImage />
+    <CustomImageName />
+    <Description />
+    <PasswordHash />
+    <LockdownPasswordHash />
+  </RoyalDocument>
+  <RoyalTrash>
+    <ID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ID>
+    <Name>Trashcan</Name>
+    <Modified>05/06/2020 21:32:09.288</Modified>
+    <Created>05/06/2020 21:32:09.287</Created>
+    <ModifiedBy>EXAMPLE\Administrator</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>2</PositionNr>
+    <IsExpanded>False</IsExpanded>
+    <ParentID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ParentID>
+  </RoyalTrash>
+  <RoyalVNCConnection>
+    <ID>42f9a58b-0483-44c8-9e43-09f4c28bdd53</ID>
+    <Name>ESXi1 (Console)</Name>
+    <Modified>03/28/2021 03:00:00.814</Modified>
+    <Created>05/07/2020 00:27:59.707</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>2</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>00000000-0000-0000-0000-000000000000</CredentialId>
+    <CredentialMode>0</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ParentID>
+    <Port>5911</Port>
+    <URI>192.168.20.1</URI>
+  </RoyalVNCConnection>
+  <RoyalVNCConnection>
+    <ID>855a7ef3-5fc8-4299-849e-ab71ef37a0a7</ID>
+    <Name>ESXi2 (Console)</Name>
+    <Modified>03/28/2021 03:00:04.264</Modified>
+    <Created>05/07/2020 01:42:57.062</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>4</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>00000000-0000-0000-0000-000000000000</CredentialId>
+    <CredentialMode>0</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ParentID>
+    <Port>5912</Port>
+    <URI>192.168.20.1</URI>
+  </RoyalVNCConnection>
+  <RoyalVNCConnection>
+    <ID>a2686736-2ef5-43bd-b3ec-04efc2d9914f</ID>
+    <Name>ESXi3 (Console)</Name>
+    <Modified>03/28/2021 03:00:08.443</Modified>
+    <Created>05/07/2020 01:43:14.031</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>6</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>00000000-0000-0000-0000-000000000000</CredentialId>
+    <CredentialMode>0</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ParentID>
+    <Port>5913</Port>
+    <URI>192.168.20.1</URI>
+  </RoyalVNCConnection>
+  <RoyalSSHConnection>
+    <ID>83102e9d-1cae-411b-a5d1-84627a5f16cc</ID>
+    <Name>vCenter (SSH)</Name>
+    <Modified>03/28/2021 03:00:12.199</Modified>
+    <Created>05/06/2020 21:32:01.187</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>8</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <AutoAdjustTerminalSize>True</AutoAdjustTerminalSize>
+    <BackColor>0</BackColor>
+    <BlinkCursor>False</BlinkCursor>
+    <BlinkingTextMode>0</BlinkingTextMode>
+    <BoldColor>9</BoldColor>
+    <ColorCursorColour>10</ColorCursorColour>
+    <ColorDefaultBackground>#000000</ColorDefaultBackground>
+    <ColorDefaultForeground>#55FF55</ColorDefaultForeground>
+    <ColorFromParent>False</ColorFromParent>
+    <ColorScheme>2</ColorScheme>
+    <ConnectionType>ssh;SSH Connection</ConnectionType>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>b74eeb7d-807d-462c-993c-bd204b77de08</CredentialId>
+    <CredentialKeyMode>0</CredentialKeyMode>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CursorAppearance>0</CursorAppearance>
+    <CursorBlinkingInterval>500</CursorBlinkingInterval>
+    <CustomImageList>{}</CustomImageList>
+    <CustomPalette0NormalBlack>#000000</CustomPalette0NormalBlack>
+    <CustomPalette10BrightGreen>#55FF55</CustomPalette10BrightGreen>
+    <CustomPalette11BrightYellow>#FFFF55</CustomPalette11BrightYellow>
+    <CustomPalette12BrightBlue>#5555FF</CustomPalette12BrightBlue>
+    <CustomPalette13BrightMagenta>#FF55FF</CustomPalette13BrightMagenta>
+    <CustomPalette14BrightCyan>#55FFFF</CustomPalette14BrightCyan>
+    <CustomPalette15BrightWhite>#FFFFFF</CustomPalette15BrightWhite>
+    <CustomPalette1NormalRed>#BB0000</CustomPalette1NormalRed>
+    <CustomPalette2NormalGreen>#00BB00</CustomPalette2NormalGreen>
+    <CustomPalette3NormalYellow>#BBBB00</CustomPalette3NormalYellow>
+    <CustomPalette4NormalBlue>#0000BB</CustomPalette4NormalBlue>
+    <CustomPalette5NormalMagenta>#BB00BB</CustomPalette5NormalMagenta>
+    <CustomPalette6NormalCyan>#00BBBB</CustomPalette6NormalCyan>
+    <CustomPalette7NormalWhite>#BBBBBB</CustomPalette7NormalWhite>
+    <CustomPalette8BrightBlack>#555555</CustomPalette8BrightBlack>
+    <CustomPalette9BrightRed>#FF5555</CustomPalette9BrightRed>
+    <DataReceivedIndicator>False</DataReceivedIndicator>
+    <DoubleUnderlineColor>9</DoubleUnderlineColor>
+    <FaintColor>8</FaintColor>
+    <Favorite>False</Favorite>
+    <Fingerprint>0d:cc:a7:75:35:0a:94:20:dc:09:99:62:08:b9:c5:b2</Fingerprint>
+    <Font>Consolas</Font>
+    <FontDisableStyles>False</FontDisableStyles>
+    <FontIsBold>False</FontIsBold>
+    <FontRenderingMode>0</FontRenderingMode>
+    <FontSize>10</FontSize>
+    <ForeColor>10</ForeColor>
+    <InactivityIndicator>False</InactivityIndicator>
+    <InactivityIndicatorThreshold>5</InactivityIndicatorThreshold>
+    <IsSerialPortConnection>False</IsSerialPortConnection>
+    <IsTelnetConnection>False</IsTelnetConnection>
+    <ItalicColor>11</ItalicColor>
+    <ParentID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ParentID>
+    <Port>22</Port>
+    <RebexHighlighting>{}</RebexHighlighting>
+    <ScrollbackResetOnDisplayActivity>True</ScrollbackResetOnDisplayActivity>
+    <SGRMode>0</SGRMode>
+    <ShowWindowTitle>False</ShowWindowTitle>
+    <SingleUnderlineColor>9</SingleUnderlineColor>
+    <SmartCursorColor>True</SmartCursorColor>
+    <SSHDisplayPreAuthenticationBanner>True</SSHDisplayPreAuthenticationBanner>
+    <URI>vcsa1.example.local</URI>
+  </RoyalSSHConnection>
+  <RoyalWebConnection>
+    <ID>b454630d-d35f-462c-9760-6b1cb0ddf9a2</ID>
+    <Name>vCenter (HTTPS)</Name>
+    <Modified>03/28/2021 03:00:17.512</Modified>
+    <Created>05/06/2020 23:57:09.816</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>10</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <AdditionalPluginDirs>{}</AdditionalPluginDirs>
+    <AllowClipboardAccess>True</AllowClipboardAccess>
+    <AllowCloseWindow>True</AllowCloseWindow>
+    <AllowJavaScript>True</AllowJavaScript>
+    <AllowOpenWindow>True</AllowOpenWindow>
+    <AllowPlugins>True</AllowPlugins>
+    <AllowZooming>True</AllowZooming>
+    <AutoFillDelay>200</AutoFillDelay>
+    <AutoFillMappingX>{\{"Mode":"ReplaceValue","Name":"username","Selector":"#username","ReplacementValue":"administrator@lab1.local","Result":0}};{\{"Mode":"ReplaceValue","Name":"password","Selector":"#password","ReplacementValue":"Aws2020@","Result":0}};{\{"Mode":"Click","Name":"Login","Selector":"#submit","ReplacementValue":"","Result":0}}</AutoFillMappingX>
+    <AutoRefresh>False</AutoRefresh>
+    <BrowserHeight>0</BrowserHeight>
+    <BrowserWidth>0</BrowserWidth>
+    <ClearCache>False</ClearCache>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>00000000-0000-0000-0000-000000000000</CredentialId>
+    <CredentialMode>0</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomField10FromParent>False</CustomField10FromParent>
+    <CustomField11FromParent>False</CustomField11FromParent>
+    <CustomField12FromParent>False</CustomField12FromParent>
+    <CustomField13FromParent>False</CustomField13FromParent>
+    <CustomField14FromParent>False</CustomField14FromParent>
+    <CustomField15FromParent>False</CustomField15FromParent>
+    <CustomField16FromParent>False</CustomField16FromParent>
+    <CustomField17FromParent>False</CustomField17FromParent>
+    <CustomField18FromParent>False</CustomField18FromParent>
+    <CustomField19FromParent>False</CustomField19FromParent>
+    <CustomField1FromParent>False</CustomField1FromParent>
+    <CustomField20FromParent>False</CustomField20FromParent>
+    <CustomField2FromParent>False</CustomField2FromParent>
+    <CustomField3FromParent>False</CustomField3FromParent>
+    <CustomField4FromParent>False</CustomField4FromParent>
+    <CustomField5FromParent>False</CustomField5FromParent>
+    <CustomField6FromParent>False</CustomField6FromParent>
+    <CustomField7FromParent>False</CustomField7FromParent>
+    <CustomField8FromParent>False</CustomField8FromParent>
+    <CustomField9FromParent>False</CustomField9FromParent>
+    <CustomImageList>{}</CustomImageList>
+    <CustomPropertiesFromParent>False</CustomPropertiesFromParent>
+    <DashboardUseAppSettings>True</DashboardUseAppSettings>
+    <DisableBuiltInPlugins>False</DisableBuiltInPlugins>
+    <DisableGPU>False</DisableGPU>
+    <DisableSpellChecker>False</DisableSpellChecker>
+    <DisableWebSecurity>False</DisableWebSecurity>
+    <DisplayMode>0</DisplayMode>
+    <ExternalLeft>0</ExternalLeft>
+    <ExternalPositionMode>0</ExternalPositionMode>
+    <ExternalScreenMode>0</ExternalScreenMode>
+    <ExternalSizeMode>0</ExternalSizeMode>
+    <ExternalTop>0</ExternalTop>
+    <Favorite>False</Favorite>
+    <IgnoreCertificateErrors>True</IgnoreCertificateErrors>
+    <KeySequenceEnabled>False</KeySequenceEnabled>
+    <KeySequenceFromParent>False</KeySequenceFromParent>
+    <LoadImages>True</LoadImages>
+    <MinimizeMainWindow>False</MinimizeMainWindow>
+    <Notes>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+	&lt;head&gt;
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;&lt;title&gt;
+		&lt;/title&gt;
+		&lt;style type="text/css"&gt;
+			.cs2654AE3A{text-align:left;text-indent:0pt;margin:0pt 0pt 0pt 0pt}
+			.csC8F6D76{color:#000000;background-color:transparent;font-family:Calibri;font-size:11pt;font-weight:normal;font-style:normal;}
+		&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;p class="cs2654AE3A"&gt;&lt;span class="csC8F6D76"&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;
+&lt;/html&gt;
+    </Notes>
+    <NotesFromParent>False</NotesFromParent>
+    <OpenLinksInBrowser>False</OpenLinksInBrowser>
+    <OpenPopupsInBrowser>False</OpenPopupsInBrowser>
+    <ParentID>4bc42b9d-4963-403d-9c31-0d9a6578f224</ParentID>
+    <PlugInWin>f008c2f0-5fb3-4c5e-a8eb-8072c1183088</PlugInWin>
+    <PostDisconnectTaskConditionLast>False</PostDisconnectTaskConditionLast>
+    <PostDisconnectTaskFromParent>False</PostDisconnectTaskFromParent>
+    <PostDisconnectTaskId>00000000-0000-0000-0000-000000000000</PostDisconnectTaskId>
+    <PostDisconnectTaskMode>1</PostDisconnectTaskMode>
+    <PostDisconnectTaskWait>False</PostDisconnectTaskWait>
+    <PreConnectTaskConditionAbort>False</PreConnectTaskConditionAbort>
+    <PreConnectTaskConditionFirst>False</PreConnectTaskConditionFirst>
+    <PreConnectTaskFromParent>False</PreConnectTaskFromParent>
+    <PreConnectTaskId>00000000-0000-0000-0000-000000000000</PreConnectTaskId>
+    <PreConnectTaskMode>1</PreConnectTaskMode>
+    <PreConnectTaskWait>False</PreConnectTaskWait>
+    <ProxyCredentialID>00000000-0000-0000-0000-000000000000</ProxyCredentialID>
+    <ProxyCredentialMode>0</ProxyCredentialMode>
+    <ProxyDirectMode>False</ProxyDirectMode>
+    <ProxyMode>0</ProxyMode>
+    <ProxyPort>8080</ProxyPort>
+    <RetryAutoFillUntilSuccess>False</RetryAutoFillUntilSuccess>
+    <ScanCommonPlugins>True</ScanCommonPlugins>
+    <SecureGatewayFromParent>False</SecureGatewayFromParent>
+    <SecureGatewayID>00000000-0000-0000-0000-000000000000</SecureGatewayID>
+    <SecureGatewayUsageMode>0</SecureGatewayUsageMode>
+    <ShowToolbar>False</ShowToolbar>
+    <URI>https://vcsa1.example.local/ui</URI>
+    <UseBasicAuth>False</UseBasicAuth>
+    <UseCustomContent>False</UseCustomContent>
+    <UseDedicatedEngine>False</UseDedicatedEngine>
+    <UseGlobalPlugInWin>False</UseGlobalPlugInWin>
+    <ZoomFactor>100</ZoomFactor>
+  </RoyalWebConnection>
+  <RoyalFolder>
+    <ID>c88a78bf-748f-42ac-af29-b7284f3bca21</ID>
+    <Name>Live Connections</Name>
+    <Modified>04/01/2021 16:28:07.885</Modified>
+    <Created>05/06/2020 21:32:09.288</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>4</PositionNr>
+    <IsExpanded>True</IsExpanded>
+    <ParentID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ParentID>
+    <ColorFromParent>False</ColorFromParent>
+    <Color />
+    <CustomImage />
+    <CustomImageName />
+    <CustomImageList>{}</CustomImageList>
+    <Description />
+    <Favorite>False</Favorite>
+  </RoyalFolder>
+  <RoyalVMwareConnection>
+    <ID>2ebc8d41-a09e-42ac-84a9-9ae4277e3d1d</ID>
+    <Name>vcsa1</Name>
+    <Modified>03/28/2021 03:00:24.065</Modified>
+    <Created>05/06/2020 23:33:41.599</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>2</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <AutoRefresh>True</AutoRefresh>
+    <AutoRefreshIntervalInSeconds>15</AutoRefreshIntervalInSeconds>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>b74eeb7d-807d-462c-993c-bd204b77de08</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <DashboardAutoShowData>True</DashboardAutoShowData>
+    <DashboardUseAppSettings>False</DashboardUseAppSettings>
+    <DetailSplitterPosition>400</DetailSplitterPosition>
+    <DisplayMode>0</DisplayMode>
+    <ExternalLeft>0</ExternalLeft>
+    <ExternalPositionMode>0</ExternalPositionMode>
+    <ExternalScreenMode>0</ExternalScreenMode>
+    <ExternalSizeMode>0</ExternalSizeMode>
+    <ExternalTop>0</ExternalTop>
+    <Favorite>False</Favorite>
+    <GridCustomization>&lt;XtraSerializer version="1.0" application="View"&gt;
+  &lt;property name="#LayoutVersion" /&gt;
+  &lt;property name="#LayoutScaleFactor"&gt;@1,Width=1@1,Height=1&lt;/property&gt;
+  &lt;property name="OptionsView" isnull="true" iskey="true"&gt;
+    &lt;property name="ColumnAutoWidth"&gt;false&lt;/property&gt;
+    &lt;property name="ShowGroupPanel"&gt;false&lt;/property&gt;
+    &lt;property name="ShowHorizontalLines"&gt;False&lt;/property&gt;
+    &lt;property name="ShowVerticalLines"&gt;False&lt;/property&gt;
+    &lt;property name="ShowIndicator"&gt;false&lt;/property&gt;
+  &lt;/property&gt;
+  &lt;property name="ActiveFilterEnabled"&gt;true&lt;/property&gt;
+  &lt;property name="Columns" iskey="true" value="35"&gt;
+    &lt;property name="Item1" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colName&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;0&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item2" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colOverallStatus&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;1&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item3" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colPowerState&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;2&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item4" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colGuestState&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;3&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item5" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colUptime&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;4&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item6" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colProvisionedSpace&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;5&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item7" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colUsedSpace&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;6&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item8" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostMemoryUsage&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;7&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item9" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colGuestMemoryUsage&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;8&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item10" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colGuestIpAddress&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;9&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item11" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colRemoteDisplay.vnc.enabled&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;10&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item12" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colRemoteDisplay.vnc.port&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;11&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item13" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colNotes&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;12&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item14" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostName&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;13&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item15" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostIP&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;14&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item16" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colDataCenter&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;15&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item17" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colUUID&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;16&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item18" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;col__ComputerName&lt;/property&gt;
+      &lt;property name="VisibleIndex"&gt;17&lt;/property&gt;
+      &lt;property name="Visible"&gt;true&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item19" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colOverallCpuUsage&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item20" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colMaxCpuUsage&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item21" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colGuestFullName&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item22" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colGuestMemoryPercent&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item23" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colMaxMemoryUsage&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item24" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colPrivateMemory&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item25" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colAllGuestIpAddresses&lt;/property&gt;
+      &lt;property name="Width"&gt;100&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item26" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colMoRef&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item27" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colVMVersion&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item28" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colChangeVersion&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item29" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colToolsVersion&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item30" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostVersion&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item31" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostBuild&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item32" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostProductName&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item33" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colHostAgentUpdateLevel&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item34" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colRemoteDisplay.vnc.password&lt;/property&gt;
+      &lt;property name="Width"&gt;150&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+    &lt;property name="Item35" isnull="true" iskey="true"&gt;
+      &lt;property name="Name"&gt;colSnapshots&lt;/property&gt;
+      &lt;property name="Width"&gt;50&lt;/property&gt;
+      &lt;property name="MinWidth"&gt;10&lt;/property&gt;
+      &lt;property name="MaxWidth"&gt;0&lt;/property&gt;
+    &lt;/property&gt;
+  &lt;/property&gt;
+  &lt;property name="GroupSummary" iskey="true" value="1"&gt;
+    &lt;property name="Item1" isnull="true" iskey="true"&gt;
+      &lt;property name="ShowInGroupColumnFooterName" /&gt;
+      &lt;property name="Tag" isnull="true" /&gt;
+      &lt;property name="FieldName" /&gt;
+      &lt;property name="SummaryType"&gt;Count&lt;/property&gt;
+      &lt;property name="DisplayFormat"&gt;[{0} Row(s)]&lt;/property&gt;
+    &lt;/property&gt;
+  &lt;/property&gt;
+  &lt;property name="ActiveFilterString" /&gt;
+  &lt;property name="GroupSummarySortInfoState" /&gt;
+  &lt;property name="FindFilterText" /&gt;
+  &lt;property name="FindPanelVisible"&gt;false&lt;/property&gt;
+&lt;/XtraSerializer&gt;</GridCustomization>
+    <KeySequenceEnabled>False</KeySequenceEnabled>
+    <KeySequenceFromParent>False</KeySequenceFromParent>
+    <ManagementEndpointFromParent>False</ManagementEndpointFromParent>
+    <ManagementEndpointID>00000000-0000-0000-0000-000000000000</ManagementEndpointID>
+    <MaxColumnWidth>False</MaxColumnWidth>
+    <MinimizeMainWindow>False</MinimizeMainWindow>
+    <ParentID>c88a78bf-748f-42ac-af29-b7284f3bca21</ParentID>
+    <PostDisconnectTaskConditionLast>False</PostDisconnectTaskConditionLast>
+    <PostDisconnectTaskFromParent>False</PostDisconnectTaskFromParent>
+    <PostDisconnectTaskId>00000000-0000-0000-0000-000000000000</PostDisconnectTaskId>
+    <PostDisconnectTaskMode>1</PostDisconnectTaskMode>
+    <PostDisconnectTaskWait>False</PostDisconnectTaskWait>
+    <PreConnectTaskConditionAbort>False</PreConnectTaskConditionAbort>
+    <PreConnectTaskConditionFirst>False</PreConnectTaskConditionFirst>
+    <PreConnectTaskFromParent>False</PreConnectTaskFromParent>
+    <PreConnectTaskId>00000000-0000-0000-0000-000000000000</PreConnectTaskId>
+    <PreConnectTaskMode>1</PreConnectTaskMode>
+    <PreConnectTaskWait>False</PreConnectTaskWait>
+    <ServicePort>443</ServicePort>
+    <ShowHorizontalLines>False</ShowHorizontalLines>
+    <ShowVerticalLines>False</ShowVerticalLines>
+    <SSHPort>22</SSHPort>
+    <URI>vcsa1.example.local</URI>
+    <UseHttps>True</UseHttps>
+  </RoyalVMwareConnection>
+  <RoyalRDSConnection>
+    <ID>15c4c386-9cae-4118-9b4f-0cdd2991072b</ID>
+    <Name>cifs-01a.example.local</Name>
+    <Modified>03/28/2021 03:02:28.535</Modified>
+    <Created>03/28/2021 03:02:14.824</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>4</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>a7080601-be25-433d-b8fc-92332f9f7a18</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>c88a78bf-748f-42ac-af29-b7284f3bca21</ParentID>
+    <RDPPort>3389</RDPPort>
+    <URI>cifs-01a.example.local</URI>
+  </RoyalRDSConnection>
+  <RoyalRDSConnection>
+    <ID>15c4c386-9cae-4118-9b4f-0cdd2991072c</ID>
+    <Name>mssql-01a.example.local</Name>
+    <Modified>03/28/2021 03:02:28.535</Modified>
+    <Created>03/28/2021 03:02:14.824</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>6</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>a7080601-be25-433d-b8fc-92332f9f7a18</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>c88a78bf-748f-42ac-af29-b7284f3bca21</ParentID>
+    <RDPPort>3389</RDPPort>
+    <URI>mssql-01a.example.local</URI>
+  </RoyalRDSConnection>
+  <RoyalRDSConnection>
+    <ID>15c4c386-9cae-4118-9b4f-0cdd2991072d</ID>
+    <Name>veeam-01a.example.local</Name>
+    <Modified>03/28/2021 03:02:28.535</Modified>
+    <Created>03/28/2021 03:02:14.824</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>8</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>a7080601-be25-433d-b8fc-92332f9f7a18</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>c88a78bf-748f-42ac-af29-b7284f3bca21</ParentID>
+    <RDPPort>3389</RDPPort>
+    <URI>veeam-01a.example.local</URI>
+  </RoyalRDSConnection>
+  <RoyalFolder>
+    <ID>8517b5d8-0ffc-47cc-9926-b9263a0b4635</ID>
+    <Name>Dont Exist Yet</Name>
+    <Modified>04/01/2021 16:27:58.530</Modified>
+    <Created>04/01/2021 16:27:28.997</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>EXAMPLE\Admin</CreatedBy>
+    <PositionNr>6</PositionNr>
+    <IsExpanded>True</IsExpanded>
+    <ParentID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ParentID>
+    <ObjectSpecialUsage />
+    <CustomField11 />
+    <CustomField12 />
+    <CustomField13 />
+    <CustomField14 />
+    <CustomField15 />
+    <CustomField16 />
+    <CustomField17 />
+    <CustomField18 />
+    <CustomField19 />
+    <CustomField20 />
+    <CustomProperties />
+    <CredentialPassword />
+    <CredentialPassphrase />
+  </RoyalFolder>
+  <RoyalRDSConnection>
+    <ID>55785fee-8274-4472-9da5-38b4d09d458a</ID>
+    <Name>mssql-01b.example.local</Name>
+    <Modified>04/01/2021 16:27:50.924</Modified>
+    <Created>03/28/2021 03:02:14.824</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>2</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>a7080601-be25-433d-b8fc-92332f9f7a18</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>8517b5d8-0ffc-47cc-9926-b9263a0b4635</ParentID>
+    <RDPPort>3389</RDPPort>
+    <URI>mssql-01a.example.local</URI>
+    <Color />
+    <CustomImage />
+    <CustomImageName />
+    <ConnectToAdministerOrConsole>False</ConnectToAdministerOrConsole>
+    <Description />
+    <PhysicalAddress />
+  </RoyalRDSConnection>
+  <RoyalRDSConnection>
+    <ID>15c4c386-9cae-4118-9b4f-0cdd2991072e</ID>
+    <Name>commvault-01a.example.local</Name>
+    <Modified>04/01/2021 16:27:50.924</Modified>
+    <Created>03/28/2021 03:02:14.824</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>4</PositionNr>
+    <IsConnectionTemplate>False</IsConnectionTemplate>
+    <ColorFromParent>False</ColorFromParent>
+    <CredentialAutologon>True</CredentialAutologon>
+    <CredentialFromParent>False</CredentialFromParent>
+    <CredentialId>a7080601-be25-433d-b8fc-92332f9f7a18</CredentialId>
+    <CredentialMode>3</CredentialMode>
+    <CredentialOmitDomain>False</CredentialOmitDomain>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>8517b5d8-0ffc-47cc-9926-b9263a0b4635</ParentID>
+    <RDPPort>3389</RDPPort>
+    <URI>commvault-01a.example.local</URI>
+  </RoyalRDSConnection>
+  <RoyalFolder>
+    <ID>23b42f68-3b1b-4051-b8f3-df6a79465135</ID>
+    <Name>Credentials</Name>
+    <Modified>04/01/2021 16:27:58.530</Modified>
+    <Created>05/06/2020 21:32:09.289</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>8</PositionNr>
+    <IsExpanded>False</IsExpanded>
+    <ParentID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ParentID>
+  </RoyalFolder>
+  <RoyalCredential>
+    <ID>927f13bb-2270-4fc7-bb68-06b76613f778</ID>
+    <Name>root</Name>
+    <Modified>05/06/2020 23:49:36.017</Modified>
+    <Created>05/06/2020 23:47:41.825</Created>
+    <ModifiedBy>EXAMPLE\Administrator</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>2</PositionNr>
+    <AutoFillDelay>200</AutoFillDelay>
+    <AutoFillMapping>{}</AutoFillMapping>
+    <ColorFromParent>False</ColorFromParent>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>23b42f68-3b1b-4051-b8f3-df6a79465135</ParentID>
+    <Password>vV8CtsppSE2GakWi5+SF50+Z+gZR6XIrmZvjESDKEDgbym31sqLvjnhOtwd0wCERma3MYyUHdgydcMEzbTi1cJLtb8sudltPnoN5bMDeAbY=</Password>
+    <PrivateKeyMode>0</PrivateKeyMode>
+    <RetryAutoFillUntilSuccess>False</RetryAutoFillUntilSuccess>
+    <UserName>root</UserName>
+  </RoyalCredential>
+  <RoyalCredential>
+    <ID>b74eeb7d-807d-462c-993c-bd204b77de08</ID>
+    <Name>administrator@lab1.local</Name>
+    <Modified>05/06/2020 23:49:36.017</Modified>
+    <Created>05/06/2020 17:31:20.080</Created>
+    <ModifiedBy>EXAMPLE\Administrator</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>4</PositionNr>
+    <AutoFillDelay>200</AutoFillDelay>
+    <AutoFillMapping>{}</AutoFillMapping>
+    <ColorFromParent>False</ColorFromParent>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <Notes>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+	&lt;head&gt;
+		&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;&lt;title&gt;
+		&lt;/title&gt;
+		&lt;style type="text/css"&gt;
+			.cs2654AE3A{text-align:left;text-indent:0pt;margin:0pt 0pt 0pt 0pt}
+			.csC8F6D76{color:#000000;background-color:transparent;font-family:Calibri;font-size:11pt;font-weight:normal;font-style:normal;}
+		&lt;/style&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+		&lt;p class="cs2654AE3A"&gt;&lt;span class="csC8F6D76"&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;
+&lt;/html&gt;
+    </Notes>
+    <NotesFromParent>False</NotesFromParent>
+    <ParentID>23b42f68-3b1b-4051-b8f3-df6a79465135</ParentID>
+    <Password>Z4jISHnxgU08ChnAc6Rv2kqtwSkxJMR0bSRks4pgClpfPOvRFE5LbFVAMPO/TTsrT/I8EEF9MFMelQtejHzHvz2efYMuX0BS4yUWg5FD6E0=</Password>
+    <PrivateKeyMode>0</PrivateKeyMode>
+    <RetryAutoFillUntilSuccess>False</RetryAutoFillUntilSuccess>
+    <UserName>administrator@lab1.local</UserName>
+  </RoyalCredential>
+  <RoyalCredential>
+    <ID>a7080601-be25-433d-b8fc-92332f9f7a18</ID>
+    <Name>admin@example.local</Name>
+    <Modified>03/28/2021 03:01:09.480</Modified>
+    <Created>03/28/2021 03:00:57.328</Created>
+    <ModifiedBy>seahow</ModifiedBy>
+    <CreatedBy>seahow</CreatedBy>
+    <PositionNr>6</PositionNr>
+    <ColorFromParent>False</ColorFromParent>
+    <CustomImageList>{}</CustomImageList>
+    <Favorite>False</Favorite>
+    <ParentID>23b42f68-3b1b-4051-b8f3-df6a79465135</ParentID>
+    <Password>XlYufvQOvcxUOFbCemJp5xu4QtGtTLbZbv1QZfLpueFwZQLYtcqCghPncty1k6qCQeXVnawcdOPbaF+cBOrDqlff1RirsKuH0TgqSWJTSgo=</Password>
+    <UserName>admin@example.local</UserName>
+  </RoyalCredential>
+  <RoyalFolder>
+    <ID>e2451f28-15b1-476c-a7b0-fabfe5357045</ID>
+    <Name>Tasks</Name>
+    <Modified>04/01/2021 16:27:58.530</Modified>
+    <Created>05/06/2020 21:32:09.289</Created>
+    <ModifiedBy>EXAMPLE\Admin</ModifiedBy>
+    <CreatedBy>EXAMPLE\Administrator</CreatedBy>
+    <PositionNr>10</PositionNr>
+    <IsExpanded>True</IsExpanded>
+    <ParentID>cbbf68c3-50ef-4fe5-a446-9feb0bd99be5</ParentID>
+  </RoyalFolder>
+</RTSZDocument>

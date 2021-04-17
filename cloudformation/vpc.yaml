@@ -1,0 +1,525 @@
+## NOTE - THIS HAS ONLY BEEN TESTED IN US-EAST-1 and US-WEST-2 YMMV elsewhere
+##
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: GPE v1.0 - Virtual Private Cloud (VPC)
+Parameters:
+  VPCName:
+    Type: String
+    Description: Name of the VPC
+  BaseStackName:
+    Type: String
+    Description: Name of the master stack (not nested one)
+  SourcePrefixForBastion:
+    Type: String
+    Description: IP Prefix in CIDR format - this is what will be allowed to RDP to the bastion
+  BaseCIDR:
+    Type: String
+    Description: Base /24 CIDR Block for this VPC
+    ConstraintDescription: Must choose a /24 from this list it will be carved up into multiple /27s
+    AllowedValues:
+      - 192.168.10.0
+      - 172.17.10.0
+    Default: 192.168.10.0
+  EnvironmentTag:
+    Description: Select to identify use case of this environment - this is helpful for reporting
+    Type: String
+    Default: "SelfStudy"
+    AllowedValues:
+      - "ProblemRepro"
+      - "ClassroomTraining"
+      - "SelfStudy"
+      - "Development"
+Mappings:
+  SubnetMap:
+    "192.168.10.0":
+      "AzApublic": "192.168.10.0/27"
+      "AzAPriv": "192.168.10.32/27"
+      "AzBpublic": "192.168.160.0/27"
+      "AzBPriv": "192.168.192.32/27"
+      "AzADirectory": "192.168.10.96/27"
+      "AzBDirectory": "192.168.10.128/27"
+    "172.17.10.0":
+      "AzApublic": "172.17.10.0/27"
+      "AzAPriv": "172.17.10.32/27"
+      "AzBpublic": "172.17.160.0/27"
+      "AzBPriv": "172.17.192.32/27"
+      "AzADirectory": "172.17.10.96/27"
+      "AzBDirectory": "172.17.10.128/27"
+  PlMap:
+    "us-west-2":
+      "corppl": "pl-5aa44133"
+    "us-east-1":
+      "corppl": "pl-4e2ece27"
+Resources:
+  vpc:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock:
+        Fn::Join:
+          - "/"
+          - - Ref: BaseCIDR
+            - "24"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value:
+            Ref: VPCName
+  natip:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+    DependsOn: vpc
+  vpcig:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-IG"
+  vpcnatgw:
+    DependsOn:
+      - vpc
+      - natip
+      - aPublic
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      SubnetId:
+        Ref: aPublic
+      AllocationId:
+        Fn::GetAtt:
+          - natip
+          - AllocationId
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-NATGW"
+  vpcgwattach:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      VpcId:
+        Ref: vpc
+      InternetGatewayId:
+        Ref: vpcig
+  aPublic:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "a"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzApublic"
+      MapPublicIpOnLaunch: True
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PublicSubnetAzA"
+        - Key: Reach
+          Value: public
+  aPriv:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "a"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzAPriv"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PrivSubnetAzA"
+        - Key: Reach
+          Value: private
+  bPublic:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "b"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzBPublic"
+      MapPublicIpOnLaunch: True
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PublicSubnetAzB"
+        - Key: Reach
+          Value: public
+  bPriv:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "b"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzBPriv"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PrivSubnetAzB"
+        - Key: Reach
+          Value: private
+  DirectorySnA:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "a"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzADirectory"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-ADSubnetA"
+        - Key: Reach
+          Value: private
+  DirectorySnB:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::Region
+            - "b"
+      CidrBlock:
+        Fn::FindInMap:
+          - SubnetMap
+          - Ref: BaseCIDR
+          - "AzBDirectory"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-ADSubnetB"
+        - Key: Reach
+          Value: private
+  PublicRT:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PublicRT"
+  PrivateRT:
+    Type: "AWS::EC2::RouteTable"
+    Properties:
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PrivateRT"
+  PublicRTassoc1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: aPublic
+      RouteTableId:
+        Ref: PublicRT
+  PublicRTassoc2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: bPublic
+      RouteTableId:
+        Ref: PublicRT
+  PrivateRTassoc1:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: aPriv
+      RouteTableId:
+        Ref: PrivateRT
+  PrivateRTassoc2:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: bPriv
+      RouteTableId:
+        Ref: PrivateRT
+  PrivateRTassoc3:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: DirectorySnA
+      RouteTableId:
+        Ref: PrivateRT
+  PrivateRTassoc4:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties:
+      SubnetId:
+        Ref: DirectorySnB
+      RouteTableId:
+        Ref: PrivateRT
+  Publicintroute:
+    Type: "AWS::EC2::Route"
+    DependsOn: vpcgwattach
+    Properties:
+      RouteTableId:
+        Ref: PublicRT
+      DestinationCidrBlock: "0.0.0.0/0"
+      GatewayId:
+        Ref: vpcig
+  Privateintroute:
+    Type: "AWS::EC2::Route"
+    DependsOn: vpcnatgw
+    Properties:
+      RouteTableId:
+        Ref: PrivateRT
+      DestinationCidrBlock: "0.0.0.0/0"
+      NatGatewayId:
+        Ref: vpcnatgw
+
+  ## START RULE DEFINITIONS OWNED BY THE Public SUBNET SG
+  ## =======================================================
+  ## Public Subnet SG Base Definition (includes egress)
+  Pubsg:
+    DependsOn:
+      - Privsg
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for Public Subnet (Bastion)
+      GroupName:
+        Fn::Join:
+          - ""
+          - - ""
+            - Ref: BaseStackName
+            - "-PubSG"
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          SourcePrefixListId:
+            Fn::FindInMap:
+              - PlMap
+              - Ref: AWS::Region
+              - "corppl"
+        - IpProtocol: -1
+          CidrIp:
+            Fn::FindInMap:
+              - SubnetMap
+              - Ref: BaseCIDR
+              - "AzADirectory"
+        - IpProtocol: -1
+          CidrIp:
+            Fn::FindInMap:
+              - SubnetMap
+              - Ref: BaseCIDR
+              - "AzBDirectory"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value: BastionSecurityGroup
+  ## Ingress Rules from Priv to Public SG
+  publicingressrulefromPriv:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: Pubsg
+    Properties:
+      SourceSecurityGroupId:
+        Ref: Privsg
+      GroupId:
+        Ref: Pubsg
+      IpProtocol: -1
+  ## Ingress Rules from Public to Public SG
+  publicingressrulefrompublic:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: Pubsg
+    Properties:
+      SourceSecurityGroupId:
+        Ref: Pubsg
+      GroupId:
+        Ref: Pubsg
+      IpProtocol: -1
+
+  ## =======================================================
+  ## START RULE DEFINITIONS OWNED BY THE Priv SUBNET SG
+  ## =======================================================
+  ## Priv SG Base Definition
+  Privsg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG for the Priv Subnet
+      GroupName:
+        Fn::Join:
+          - ""
+          - - ""
+            - Ref: BaseStackName
+            - "-PrivSG"
+      VpcId:
+        Ref: vpc
+      Tags:
+        - Key: Name
+          Value: PrivSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp:
+            Fn::FindInMap:
+              - SubnetMap
+              - Ref: BaseCIDR
+              - "AzADirectory"
+        - IpProtocol: -1
+          CidrIp:
+            Fn::FindInMap:
+              - SubnetMap
+              - Ref: BaseCIDR
+              - "AzBDirectory"
+        - IpProtocol: -1
+          CidrIp: 172.17.0.0/23
+        - IpProtocol: -1
+          CidrIp: 99.120.170.0/23
+        - IpProtocol: 1
+          CidrIp: 192.168.0.0/16
+          FromPort: -1
+          ToPort: -1
+  ## Ingress Rules from Public to Priv SG
+  PrivingressrulefromPub1:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: Pubsg
+    Properties:
+      SourceSecurityGroupId:
+        Ref: Pubsg
+      GroupId:
+        Ref: Privsg
+      IpProtocol: -1
+  PrivingressrulefromPriv:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: Privsg
+    Properties:
+      SourceSecurityGroupId:
+        Ref: Privsg
+      GroupId:
+        Ref: Privsg
+      IpProtocol: -1
+## ==============================================================
+Outputs:
+  vpc:
+    Description: "VPC id"
+    Value:
+      Ref: vpc
+  aPublic:
+    Description: "Public a subnet id"
+    Value:
+      Ref: aPublic
+  aPriv:
+    Description: "Priv a subnet id"
+    Value:
+      Ref: aPriv
+  bPublic:
+    Description: "Public b subnet id"
+    Value:
+      Ref: bPublic
+  bPriv:
+    Description: "Priv b subnet id"
+    Value:
+      Ref: bPriv
+  DirectorySnA:
+    Description: "Ad Subnet 1"
+    Value:
+      Ref: DirectorySnA
+  DirectorySnB:
+    Description: "Ad Subnet 2"
+    Value:
+      Ref: DirectorySnB
+  Pubsg:
+    Description: "Public security group id"
+    Value:
+      Ref: Pubsg
+  Privsg:
+    Description: "Priv security group id"
+    Value:
+      Ref: Privsg
+  PrivateRT:
+    Description: id of private route table
+    Value:
+      Ref: PrivateRT
+  PublicRT:
+    Description: id of public route table
+    Value:
+      Ref: PublicRT

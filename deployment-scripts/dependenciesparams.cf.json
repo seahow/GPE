@@ -1,0 +1,49 @@
+{
+    "Parameters": [
+        {
+            "ParameterKey": "NameSalt",
+            "ParameterValue": "NAMESALTPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "DBInstanceClass",
+            "ParameterValue": "DBINSTANCECLASSPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "DBPassword",
+            "ParameterValue": "DBPASSWORDPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "DBUser",
+            "ParameterValue": "DBUSERPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "DBStorage",
+            "ParameterValue": "DBSTORAGEPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "SourcePrefixForBastion",
+            "ParameterValue": "99.120.170.0/23"
+        },
+        {
+            "ParameterKey": "TimeZone",
+            "ParameterValue": "TIMEZONEPLACEHOLDER Standard Time"
+        },
+        {
+            "ParameterKey": "BastionInstanceType",
+            "ParameterValue": "INSTANCETYPEPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "KeyName",
+            "ParameterValue": "KEYPAIRPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "S3Bucket",
+            "ParameterValue": "S3BUCKETPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "S3Path",
+            "ParameterValue": "S3PATHPLACEHOLDER"
+        }
+    ],
+    "OnFailure": "DO_NOTHING"
+}

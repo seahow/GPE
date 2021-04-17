@@ -1,0 +1,571 @@
+##
+## April 2020
+## seahow@amazon.com
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: General Purpose Environment (GPE) v1.0
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Prerequisites
+        Parameters:
+          - KeyName
+          - S3Bucket
+          - S3Path
+      - Label:
+          default: General
+        Parameters:
+          - EnvironmentTag
+          - BaseCIDR
+          - SourcePrefixForBastion
+          - TimeZone
+      - Label:
+          default: Bastion
+        Parameters:
+          - WindowsAMI
+          - WindowsOSTag
+          - WinBastionHostName
+          - BastionInstanceType
+          - WindowsPVSize
+      - Label:
+          default: Active Directory
+        Parameters:
+          - DomainAdminPassword
+          - DomainDNSName
+          - DomainNetBIOSName
+      - Label:
+          default: Advanced
+        Parameters:
+          - NameSalt
+    ParameterLabels:
+      WindowsPVSize:
+        default: Size in GB of the Windows bastion host's C:\ drive
+      TimeZone:
+        default: This facilitates event correlation in CloudWatch
+      NameSalt:
+        default: 3-4 random alphanumeric characters to make build element names unique
+      KeyName:
+        default: Public/Private Key Pair
+      BastionInstanceType:
+        default: Instance Type for your Bastion Servers
+      SourcePrefixForBastion:
+        default: Please do not put 0.0.0.0/0 here
+      BaseCIDR:
+        default: /24 CIDR Block that will be cut up into /27s
+      DomainAdminPassword:
+        default: Domain Administrator password for your AD environment
+      DomainDNSName:
+        default: DNS name for your AD environment
+      DomainNetBIOSName:
+        default: WINS/NetBIOS name for your AD environment
+      WindowsAMI:
+        default: SSM Public Parameter to query for Windows AMI [Bastion]
+      EnvironmentTag:
+        default: Environment type to tag this instance as
+      WindowsOSTag:
+        default: OS Tag for patch grouping [Bastion]
+      S3Bucket:
+        default: S3 Bucket containing dependencies of this solution
+      S3Path:
+        default: S3 Prefix/Directory where the root of our content tree lives
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  BastionInstanceType:
+    Description: "Windows Bastion Instance Type"
+    Type: String
+    Default: t3a.2xlarge
+  WindowsAMI:
+    Type: String
+    Default: "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+    Description: "More information - https://aws.amazon.com/blogs/mt/query-for-the-latest-windows-ami-using-systems-manager-parameter-store/"
+  WindowsOSTag:
+    Description: Leave this alone unless you know what you're doing
+    Type: String
+    Default: "WindowsServer2019"
+    AllowedValues:
+      - "WindowsServer2019"
+  TimeZone:
+    Description: Time Zone in Windows Format for the Bastion Instance
+    Type: String
+    Default: "Central Standard Time"
+  WindowsPVSize:
+    Description: AMI starts out at 40GB and will expand to whatever you put here
+    Type: Number
+    Default: 60
+    MaxValue: 100
+    MinValue: 50
+  EnvironmentTag:
+    Description: Select to identify use case of this environment - this is helpful for reporting but also makes patching easier when you have multiple environments
+    Type: String
+    Default: "SelfStudy"
+    AllowedValues:
+      - "ProblemRepro"
+      - "ClassroomTraining"
+      - "SelfStudy"
+      - "Development"
+  S3Bucket:
+    Type: String
+    Description: just the s3 bucket base name, i.e. mys3bucket
+  S3Path:
+    Type: String
+    Description: just the base prefix name with no slashes on either end i.e. myprefix/mysubprefix
+  SourcePrefixForBastion:
+    Type: String
+    Description: IP Prefix in CIDR format - this is what will be allowed to RDP to the bastion and SSH to the Utility server
+  BaseCIDR:
+    Type: String
+    Description: Base /24 CIDR Block for this VPC
+    ConstraintDescription: Must choose a /24 from this list (it will be carved up into multiple /27s)
+    AllowedValues:
+      - 192.168.10.0
+      - 172.17.0.0
+    Default: 192.168.10.0
+  DomainAdminPassword:
+    Type: String
+    Description: Defaults to Aws2020@ if you don't change it
+    Default: Aws2020@
+    MinLength: "8"
+    MaxLength: "32"
+    AllowedPattern: "(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*"
+    NoEcho: "true"
+  DomainDNSName:
+    Type: String
+    MinLength: "2"
+    MaxLength: "255"
+    AllowedPattern: "[a-zA-Z0-9\\-]+\\..+"
+    Default: example.local
+    Description: The Managed AD instance will use this as a domain name for your environment
+  DomainNetBIOSName:
+    Type: String
+    MinLength: "1"
+    MaxLength: "15"
+    AllowedPattern: "[a-zA-Z0-9\\-]+"
+    Default: EXAMPLE
+    Description: NetBIOS-compliant 15 character label
+  NameSalt:
+    Type: String
+    Description: Only needed if you plan to deploy this stack multiple times to the same account
+    Default: 00
+  DBInstanceClass:
+    Type: String
+    Description: Database instance node size
+    Default: db.r5b.xlarge
+  DBPassword:
+    Type: String
+    Description: Should probably just leave this alone
+    Default: Aws2020@
+  DBUser:
+    Type: String
+    Description: mssql username
+    Default: dbuser
+  DBName:
+    Type: String
+    Default: employees
+  DBInstanceName:
+    Type: String
+    Description: MUST be unique in your acct  
+  DBUser:
+    Type: String
+    Description: mssql username
+    Default: dbuser
+  DBStorage:
+    Type: String
+    Description: mssql db storage in GB
+    Default: 100
+Resources:
+  GPERole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Join:
+          - ""
+          - - "N"
+            - Ref: NameSalt
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  GPEPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName:
+        Fn::Join:
+          - ""
+          - - "N"
+            - Ref: NameSalt
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:DescribeStackResource
+              - cloudformation:SignalResource
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - rds:*
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ec2:*
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssm:DescribeAssociation
+              - ssm:GetDeployablePatchSnapshotForInstance
+              - ssm:GetDocument
+              - ssm:DescribeDocument
+              - ssm:GetManifest
+              - ssm:GetParameters
+              - ssm:GetParameter
+              - ssm:ListAssociations
+              - ssm:ListInstanceAssociations
+              - ssm:PutInventory
+              - ssm:PutComplianceItems
+              - ssm:PutConfigurePackageResult
+              - ssm:UpdateAssociationStatus
+              - ssm:UpdateInstanceAssociationStatus
+              - ssm:UpdateInstanceInformation
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ssmmessages:CreateControlChannel
+              - ssmmessages:CreateDataChannel
+              - ssmmessages:OpenControlChannel
+              - ssmmessages:OpenDataChannel
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ec2messages:AcknowledgeMessage
+              - ec2messages:DeleteMessage
+              - ec2messages:FailMessage
+              - ec2messages:GetEndpoint
+              - ec2messages:GetMessages
+              - ec2messages:SendReply
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - ds:CreateComputer
+              - ds:DescribeDirectories
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:GetBucketLocation
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetEncryptionConfiguration
+              - s3:AbortMultipartUpload
+              - s3:ListMultipartUploadParts
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+            Resource: "*"
+      Roles:
+        - Ref: GPERole
+  GPEInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName:
+        Fn::Join:
+          - ""
+          - - "N"
+            - Ref: NameSalt
+      Roles:
+        - Ref: GPERole
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        VPCName: GPEVPC
+        BaseCIDR:
+          Ref: BaseCIDR
+        BaseStackName:
+          Fn::Join:
+            - ""
+            - - "N"
+              - Ref: NameSalt
+        SourcePrefixForBastion:
+          Ref: SourcePrefixForBastion
+        EnvironmentTag:
+          Ref: EnvironmentTag
+      TemplateURL:
+        Fn::Join:
+          - /
+          - - "https://s3.amazonaws.com"
+            - Ref: S3Bucket
+            - Ref: S3Path
+            - "cloudformation/vpc.yaml"
+  ADService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        VpcId:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.vpc
+        Subnet1:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.DirectorySnA
+        Subnet2:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.DirectorySnB
+        DomainAdminPassword:
+          Ref: DomainAdminPassword
+        DomainDNSName:
+          Ref: DomainDNSName
+        DomainNetBIOSName:
+          Ref: DomainNetBIOSName
+        KeyName:
+          Ref: KeyName
+        EnvironmentTag:
+          Ref: EnvironmentTag
+      TemplateURL:
+        Fn::Join:
+          - /
+          - - "https://s3.amazonaws.com"
+            - Ref: S3Bucket
+            - Ref: S3Path
+            - "cloudformation/active-directory.yaml"
+  RDSDB:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        BaseStackName:
+          Ref: AWS::StackName
+        VpcId:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.vpc
+        PrivateSubnet1:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.aPriv
+        PrivateSubnet1:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.bPriv
+        DomainAdminPassword:
+          Ref: DomainAdminPassword
+        DomainDNSName:
+          Ref: DomainDNSName
+        KeyName:
+          Ref: KeyName
+        EnvironmentTag:
+          Ref: EnvironmentTag
+        DBInstanceClass:
+          Ref: DBInstanceClass
+        DBPassword:
+          Ref: DomainAdminPassword
+        DBUser:
+          Ref: dbadmin
+        DBStorage:
+          Ref: DBStorage
+        PrivSG:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.Privsg
+      TemplateURL:
+        Fn::Join:
+          - /
+          - - "https://s3.amazonaws.com"
+            - Ref: S3Bucket
+            - Ref: S3Path
+            - "cloudformation/mssql-cluster.yaml"
+  BastionInstance:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - ADService
+      - GPEInstanceProfile
+    Properties:
+      Parameters:
+        BaseStackName:
+          Ref: AWS::StackName
+        Subnet:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.aPublic
+        SecurityGroup:
+          Fn::GetAtt:
+            - VPC
+            - Outputs.Pubsg
+        KeyName:
+          Ref: KeyName
+        InstanceType:
+          Ref: BastionInstanceType
+        InstanceProfile:
+          Ref: GPEInstanceProfile
+        ADDirectoryName:
+          Ref: DomainDNSName
+        WindowsAMI:
+          Ref: WindowsAMI
+        JoinAccount:
+          Fn::Join:
+            - ""
+            - - "admin@"
+              - Ref: DomainDNSName
+        JoinAccountPassword:
+          Ref: DomainAdminPassword
+        TimeZone:
+          Ref: TimeZone
+        EnvironmentTag:
+          Ref: EnvironmentTag
+        OSTag:
+          Ref: WindowsOSTag
+        PVSize:
+          Ref: WindowsPVSize
+        S3Bucket:
+          Ref: S3Bucket
+        S3Path:
+          Ref: S3Path
+      TemplateURL:
+        Fn::Join:
+          - /
+          - - "https://s3.amazonaws.com"
+            - Ref: S3Bucket
+            - Ref: S3Path
+            - "cloudformation/bastion.yaml"
+
+Outputs:
+  BastionPublicIp:
+    Description: Public ip for rdp access to the windows host
+    Value:
+      Fn::GetAtt:
+        - BastionInstance
+        - Outputs.PublicIpForInstance
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-BastionPublicIp"
+  PublicRouteTable:
+    Description: Public Route Table
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.aPublicrt
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PublicRouteTable"
+  PrivateRouteTable:
+    Description: Private Route Table
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.aPrivatert
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-PrivateRouteTable"
+  PrivSubnet:
+    Description: Priv Subnet
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.aPriv
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-Subnet"
+  PrivSecurityGroup:
+    Description: Priv Security Group
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.Privsg
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-SecurityGroup"
+  InstanceProfile:
+    Description: Instance Profile for your Priv Instances
+    Value:
+      Ref: GPEInstanceProfile
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-InstanceProfile"
+  ADAdminAccount:
+    Description: Domain Administrator
+    Value:
+      Fn::Join:
+        - ""
+        - - "admin@"
+          - Ref: DomainDNSName
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-JoinAccount"
+  ADAdminAccountPassword:
+    Description: Domain Admin Password
+    Value:
+      Ref: DomainAdminPassword
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-JoinAccountPassword"
+  ADServer1PrivateIP:
+    Value:
+      Fn::GetAtt:
+        - ADService
+        - Outputs.ADServer1PrivateIP
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-ADDnsIpAddress1"
+  ADServer2PrivateIP:
+    Value:
+      Fn::GetAtt:
+        - ADService
+        - Outputs.ADServer2PrivateIP
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-ADDnsIpAddress2"
+  KeyName:
+    Value:
+      Ref: KeyName
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-KeyName"
+  EnvironmentTag:
+    Value:
+      Ref: EnvironmentTag
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-EnvironmentTag"
+  OSTag:
+    Value:
+      Ref: WindowsOSTag
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-OSTag"
+  S3Bucket:
+    Value:
+      Ref: S3Bucket
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-S3Bucket"
+  S3Path:
+    Value:
+      Ref: S3Path
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-S3Path"
+  ADDirectoryName:
+    Value:
+      Ref: DomainDNSName
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-ADDirectoryName"

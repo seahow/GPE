@@ -1,0 +1,485 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: GPE v1.0 - Windows 2019 Server Bastion
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Prerequisites
+        Parameters:
+          - KeyName
+          - SecurityGroup
+          - Subnet
+          - InstanceProfile
+      - Label:
+          default: Active Directory
+        Parameters:
+          - ADDirectoryName
+          - JoinAccount
+          - JoinAccountPassword
+      - Label:
+          default: Instance Settings
+        Parameters:
+          - WindowsAMI
+          - InstanceType
+          - PVSize
+          - OSTag
+          - EnvironmentTag
+    ParameterLabels:
+      InstanceType:
+        default: "EC2 Instance Type"
+      WindowsAMI:
+        default: "SSM Public Parameter to query for Windows AMI"
+      ADDirectoryName:
+        default: "AD Domain name"
+      SecurityGroup:
+        default: "Security Group for this instance"
+      Subnet:
+        default: "Subnet for this instance (this is also how AZ placement is determined)"
+      InstanceProfile:
+        default: "Instance Profile name of an IAM role with SSM and Cloudwatch agent permissions"
+      PVSize:
+        default: "Root Volume Size (C:)"
+      EnvironmentTag:
+        default: Environment type to tag this instance as
+      OSTag:
+        default: OS Tag for patch grouping
+Parameters:
+  Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: SubnetId in your Virtual Private Cloud (VPC)
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: SG for this instance
+  KeyName:
+    Description: "Select from the drop-down"
+    Type: "AWS::EC2::KeyPair::KeyName"
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  InstanceType:
+    Description: "Select from the drop-down [Note: Prices are rounded and represent linux instances]"
+    Type: String
+    Default: m5a.2xlarge
+  ADDirectoryName:
+    Type: String
+  WindowsAMI:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+    Description: "More information - https://aws.amazon.com/blogs/mt/query-for-the-latest-windows-ami-using-systems-manager-parameter-store/"
+  OSTag:
+    Description: Leave this alone
+    Type: String
+    Default: "WindowsServer2019"
+    AllowedValues:
+      - "WindowsServer2019"
+  JoinAccount:
+    Description: "More information - https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_join_privileges.html"
+    Type: String
+  JoinAccountPassword:
+    Description: Password for the AD joiner account
+    Type: String
+    NoEcho: "True"
+  PVSize:
+    Description: Default is 40GB.  Recommend you increase this to 60.
+    Type: Number
+    Default: 60
+    MaxValue: 100
+    MinValue: 40
+  TimeZone:
+    Description: Time Zone for instance
+    Type: String
+    Default: "Central Standard Time"
+  EnvironmentTag:
+    Description: Select to identify use case of this environment - this is helpful for reporting
+    Type: String
+    Default: "SelfStudy"
+    AllowedValues:
+      - "ProblemRepro"
+      - "ClassroomTraining"
+      - "SelfStudy"
+      - "Development"
+  InstanceProfile:
+    Type: String
+  S3Bucket:
+    Type: String
+    Description: just the s3 bucket base name like -> mys3bucket
+  S3Path:
+    Type: String
+    Description: just the base prefix name like -> seahow
+  BaseStackName:
+    Type: String
+    Description: Name of the parent stack
+Resources:
+  WinServerInstanceLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - "/"
+            - Ref: AWS::StackName
+            - "/w"
+            - Fn::Select:
+                - 0
+                - Fn::Split:
+                    - "-"
+                    - Fn::Select:
+                        - 2
+                        - Fn::Split:
+                            - "/"
+                            - !Ref "AWS::StackId"
+      RetentionInDays: 7
+  WinServerInstance:
+    Type: "AWS::EC2::Instance"
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT45M
+    Metadata:
+      "AWS::CloudFormation::Init":
+        configSets:
+          Default:
+            - 01_Initialize
+            - 05_choco
+        01_Initialize:
+          files:
+            "C:\\Bootstrap\\scripts\\global.ps1":
+              content: !Sub |
+
+                ## Throw the kitchen sink at executionpolicy
+                  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+                ## Fix any possible clock skew wrt AD
+                  # statically set for now to troubleshoot a problem
+                  Set-TimeZone -Name "${TimeZone}"
+                  Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\w32time\Parameters' -Name 'NtpServer' -Value '${ADDirectoryName},0x8'
+                  Restart-Service w32Time 
+                  w32tm /resync
+
+                ## Disable IE enhanced security mode
+                  $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+                  $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+                  Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
+                  Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
+
+                ## Disable Windows Firewall
+                  Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+                ## Disable Windows Defender
+                  Set-MpPreference -DisableRealtimeMonitoring $true
+
+                ## DNS tuning 
+                  # Set-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' -Name 'Domain' -Value '${ADDirectoryName}'
+                  # Set-DnsClientGlobalSetting -SuffixSearchList @("${ADDirectoryName}", "${AWS::Region}.ec2-utilities.amazonaws.com", "ec2.internal")
+                  $NetworkProfile = Get-NetConnectionProfile -InterfaceAlias 'Ethernet 3'
+                  $NetworkProfile.NetworkCategory = 'Private'
+                  Set-NetConnectionProfile -InputObject $NetworkProfile
+
+                ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
+                  exit
+          commands:
+            01-globalconfig:
+              command: Powershell -Command ".\\global.ps1"
+              cwd: "C:\\Bootstrap\\scripts"
+              waitAfterCompletion: 0
+            02_RenameComputer:
+              command:
+                Fn::Join:
+                  - ""
+                  - - 'powershell -Command "'
+                    - "Rename-Computer -NewName w"
+                    - Fn::Select:
+                        - 0
+                        - Fn::Split:
+                            - "-"
+                            - Fn::Select:
+                                - 2
+                                - Fn::Split:
+                                    - "/"
+                                    - !Ref "AWS::StackId"
+                    - ' -Force -Restart"'
+              cwd: "C:\\Bootstrap\\scripts"
+              waitAfterCompletion: forever
+        05_choco:
+          files:
+            "C:\\Bootstrap\\scripts\\ad.ps1":
+              content: !Sub |
+
+                ## Throw the kitchen sink at executionpolicy
+
+                  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+                ## Define functions
+                  function Add-Stuff 
+                    { 
+                      Install-WindowsFeature RSAT -IncludeAllSubFeature -IncludeManagementTools -ErrorAction Ignore
+                      Install-WindowsFeature nfs-client -IncludeAllSubFeature -IncludeManagementTools -ErrorAction Ignore
+                    }
+                    
+                  function Join-AD 
+                    { 
+                      $password = "${JoinAccountPassword}" | ConvertTo-SecureString -asPlainText -Force
+                      $username = "${JoinAccount}"
+                      $domain = "${ADDirectoryName}"
+                      $credential = New-Object System.Management.Automation.PSCredential($username,$password)
+
+                      Add-Computer -DomainName $domain -Credential $credential -Passthru -Verbose -Force | Out-file ad.log
+                    }
+
+                ## Try to install the selected windows features/roles
+
+                  try 
+                    {                 
+                      Add-Stuff
+                    }
+                  catch 
+                    {  
+                      write-host "FAILED on installing Windows Features..."
+                    } 
+
+                ## Try to join AD
+                  try 
+                    {                 
+                      Join-AD
+                    }
+                  catch 
+                    {  
+                      write-host "FAILED on joining AD..."
+                    }
+
+                  Remove-Item c:\\users\\default\\desktop\\*.*
+
+                ## Final Reboot
+                  Restart-Computer -Force
+
+                ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
+                  exit
+
+            "C:\\Bootstrap\\scripts\\choco.ps1":
+              content: !Sub |
+
+                ## Throw the kitchen sink at executionpolicy
+                  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+                ## make sure you can pull from powershellgallery
+                  Install-PackageProvider -Name NuGet -Force
+                  Set-PSRepository PSGallery -InstallationPolicy Trusted
+
+                ## Install ScriptLogger
+                ## more information - #https://www.powershellgallery.com/packages/ScriptLogger/3.3.0
+                  Install-Module -Name ScriptLogger
+                  Start-ScriptLogger -Path 'choco.ps1.log' -Level Verbose        
+
+                ## install chocolatey package manager
+                ## more information - https://chocolatey.org
+                  try { `iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) } catch { Write-ErrorLog -ErrorRecord $_ }
+
+                ## force environment variables to reload in the wake of chocolateys installation
+                  try { refreshenv } catch { Write-ErrorLog -ErrorRecord $_ }
+
+                ## Install packages
+                  cinst Boxstarter -y -r --no-progress --log-file .\\chocologs\\chocopackage.boxstarter.log
+                  cinst puppet-agent -y -r --no-progress --log-file .\\chocologs\\chocopackage.puppet-agent.log
+                  cinst chocolateygui -y -r --no-progress --log-file .\\chocologs\\chocopackage.gui.log
+                  cinst 7zip -y -r --no-progress --log-file .\\chocologs\\chocopackage.7zip.log
+                  cinst adobereader -y -r --no-progress --log-file .\\chocologs\\chocopackage.adobereader.log
+                  cinst flashplayerplugin -y -r --no-progress --log-file .\\chocologs\\chocopackage.flashplayerplugin.log
+                  cinst googlechrome -y -r --no-progress --log-file .\\chocologs\\chocopackage.googlechrome.log
+                  cinst jre8 -y -r --no-progress --log-file .\\chocologs\\chocopackage.jre8.log
+                  cinst winscp.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.winscp.log
+                  cinst putty.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.putty.log
+                  cinst winsshterm -y -r --no-progress --log-file .\\chocologs\\chocopackage.winssh.log
+                  cinst vmrc -y -r --no-progress --log-file .\\chocologs\\chocopackage.vmrc.log
+                  cinst vmware-powercli-psmodule -y -r --no-progress --log-file .\\chocologs\\chocopackage.powercli.log
+                  cinst notepadplusplus.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.notepadplusplus.log              
+                  cinst vscode -y -r --no-progress --log-file .\\chocologs\\chocopackage.vscode.log
+                  cinst royalts-v5 -y -r --no-progress --log-file .\\chocologs\\chocopackage.royalts.log
+                  cinst wget -y -r --no-progress --log-file .\\chocologs\\chocopackage.wget.log 
+                  cinst sysinternals -y -r --no-progress --log-file .\\chocologs\\chocopackage.sysinternals.log
+                  cinst windows-admin-center -y -r --no-progress --log-file .\\chocologs\\chocopackage.windows-admin-center.log
+                ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
+                  exit
+
+            "C:\\Bootstrap\\scripts\\final.ps1":
+              content: !Sub |
+
+                function signal-cfn 
+                {  
+                  & cfn-signal.exe -s true --stack ${AWS::StackId} --resource WinServerInstance --region ${AWS::Region}
+                }
+
+                ## Throw the kitchen sink at executionpolicy
+                  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+                  Import-Module Boxstarter.Chocolatey
+
+                  $finalstring = "Congratulations.`r`nStack ${AWS::StackName} was successfully deployed by Account ID ${AWS::AccountId} in Region ${AWS::Region}"
+                  $finalstring | Out-File "COMPLETE.TXT"
+                  Write-Host $finalstring -ForegroundColor red -BackgroundColor white
+
+                ## Customize the user experience.  This needs to happen after domain join.
+                  Expand-Archive -Force c:\\bootstrap\\bastion\\Documents.zip c:\\bootstrap\\bastion
+                  Copy-Item C:\Bootstrap\bastion\Documents\Documents\* C:\Users\Default\Documents -Recurse -Force 
+                  Copy-Item C:\Bootstrap\bastion\main.rtsz C:\Users\Public\Desktop
+                  
+                  Expand-Archive -Force c:\\bootstrap\\bastion\\tigervnc-viewer.zip c:\\users\\default\\desktop
+                  Expand-Archive -Force c:\\bootstrap\\bastion\\wallpaper.zip c:\\bootstrap\\bastion
+                  move c:\\users\\default\\desktop\\tigervnc-viewer\\L0.tigervnc c:\\users\\default\\desktop
+
+                  Copy-Item C:\bootstrap\Bookmarks\master_preferences c:\Progra~1\Google\Chrome\Application\master_preferences
+                  Copy-Item C:\bootstrap\Bookmarks\bookmarks.html c:\Progra~1\Google\Chrome\Application\bookmarks.html
+                  Copy-Item C:\bootstrap\bastion\main.bgi c:\users\default\desktop\main.bgi
+                  Copy-Item C:\bootstrap\scripts\setbginfo.cmd "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\setbginfo.cmd"
+
+                  move c:\\users\\default\\desktop\\tigervnc-viewer\\vncviewer64-1.10.1.exe c:\\bootstrap
+                  
+                  rmdir -Recurse c:\\users\\default\\desktop\\tigervnc-viewer
+
+                  cmd /c "assoc .tigervnc"
+                  cmd /c "ftype .tigervnc=""c:\\bootstrap\\vncviewer64-1.10.1.exe"" ""%1"""
+
+                  Import-StartLayout -LayoutPath c:\\bootstrap\\layout.xml -MountPath c:\
+
+                ## Overwrite default system wallpaper
+                  takeown /f c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  takeown /f C:\Windows\Web\4K\Wallpaper\Windows\*.*
+                  icacls c:\windows\WEB\wallpaper\Windows\img0.jpg /Grant 'Everyone:(F)'
+                  icacls C:\Windows\Web\4K\Wallpaper\Windows\*.* /Grant 'Everyone:(F)'
+                  Remove-Item c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  Remove-Item C:\Windows\Web\4K\Wallpaper\Windows\*.*
+                  Copy-Item C:\bootstrap\bastion\wallpaper\img0.jpg c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  Copy-Item C:\bootstrap\bastion\wallpaper\4k\*.* C:\Windows\Web\4K\Wallpaper\Windows
+
+                ## Set Windows Explorer options
+                  Import-Module Boxstarter.Chocolatey
+                  Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives -EnableShowProtectedOSFiles -EnableShowFileExtensions -EnableShowFullPathInTitleBar  -EnableExpandToOpenFolder -EnableShowRibbon            
+
+                ## Try to signal cloudformation
+                  try 
+                    { 
+                      signal-cfn
+                    } 
+                  catch 
+                    {  
+                      write-host "FAILED on signaling success to cloudformation"
+                    }
+
+                ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
+                  exit
+          commands:
+            01_choco:
+              command: Powershell -Command ".\\choco.ps1"
+              cwd: "C:\\Bootstrap\\scripts"
+              waitAfterCompletion: 0
+            02_rsat:
+              command: Powershell -Command ".\\ad.ps1"
+              cwd: "C:\\Bootstrap\\scripts"
+              waitAfterCompletion: forever
+            03_final_marker:
+              command: Powershell -Command ".\\final.ps1"
+              cwd: "C:\\Bootstrap\\scripts"
+              waitAfterCompletion: 0
+    Properties:
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Fn::Join:
+                    - ""
+                    - - "w"
+                      - Fn::Select:
+                          - 0
+                          - Fn::Split:
+                              - "-"
+                              - Fn::Select:
+                                  - 2
+                                  - Fn::Split:
+                                      - "/"
+                                      - !Ref "AWS::StackId"
+                - "."
+                - Ref: ADDirectoryName
+        - Key: OS
+          Value:
+            Ref: OSTag
+        - Key: Env
+          Value:
+            Ref: EnvironmentTag
+        - Key: Patch Group
+          Value:
+            Fn::Join:
+              - "/"
+              - - Ref: EnvironmentTag
+                - Ref: OSTag
+      ImageId:
+        Ref: WindowsAMI
+      IamInstanceProfile:
+        Ref: InstanceProfile
+      InstanceType:
+        Ref: InstanceType
+      Monitoring: true
+      SecurityGroupIds:
+        - Ref: SecurityGroup
+      KeyName:
+        Ref: KeyName
+      SubnetId:
+        Ref: Subnet
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize:
+              Ref: PVSize
+        - DeviceName: xvdf
+          Ebs:
+            VolumeType: st1
+            VolumeSize: 1024
+            DeleteOnTermination: "True"
+      UserData:
+        Fn::Base64: !Sub |
+
+          <script>
+          ## grow the root volume
+          Powershell -Command "Resize-Partition -DiskNumber 0 -PartitionNumber 1 -Size ${PVSize}GB"
+
+          ## grow the backup target
+          Powershell -Command "Resize-Partition -DiskNumber 1 -PartitionNumber 1 -Size 1024GB"
+
+          ## prep the directories
+          mkdir -p C:\\Downloads\\Amazon\\AmazonCloudWatchAgent
+          mkdir -p C:\\Bootstrap\\scripts\\chocologs
+          mkdir -p C:\\Bootstrap\\bastion
+          mkdir -p C:\\Bootstrap\\boxstarter
+          mkdir -p C:\\Bootstrap\\Bookmarks
+
+          ## Install cloudwatch agent
+          Powershell -Command "(New-Object Net.WebClient).DownloadFile('https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi','C:\Downloads\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi')"
+          msiexec.exe /qn /lv C:\Bootstrap\scripts\cwagentinstall.log /i C:\Downloads\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi
+
+          ## Install AWS CLI v2
+          Powershell -Command "(New-Object Net.WebClient).DownloadFile('https://awscli.amazonaws.com/AWSCLIV2.msi','C:\bootstrap\AWSCLIV2.msi')"
+          msiexec.exe /qn /lv C:\Bootstrap\scripts\awscliv2install.log /i C:\bootstrap\AWSCLIV2.msi
+
+          ## Download Powershell scripts and other dependencies from your s3 bucket
+          C:\\Progra~1\\amazon\\AWSCLIV2\\aws.exe s3 sync s3://${S3Bucket}/${S3Path}/powershell c:\\bootstrap\\scripts               
+          C:\\Progra~1\\amazon\\AWSCLIV2\\aws.exe s3 sync s3://${S3Bucket}/${S3Path}/bastion C:\\bootstrap\\bastion
+          C:\\Progra~1\\amazon\\AWSCLIV2\\aws.exe s3 cp s3://${S3Bucket}/${S3Path}/XML/layout.xml c:\\bootstrap\\layout.xml
+          C:\\Progra~1\\amazon\\AWSCLIV2\\aws.exe s3 cp s3://${S3Bucket}/${S3Path}/XML/bookmarks.html c:\\bootstrap\\Bookmarks\bookmarks.html
+          C:\\Progra~1\\amazon\\AWSCLIV2\\aws.exe s3 cp s3://${S3Bucket}/${S3Path}/XML/master_preferences c:\\bootstrap\\Bookmarks\master_preferences
+
+          ## Pass variables through to permanent system environment variables so internal scripts can access them
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_REGION', '${AWS::Region}', [System.EnvironmentVariableTarget]::Machine)"
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_STACKID', '${AWS::StackId}', [System.EnvironmentVariableTarget]::Machine)"
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_STACKNAME', '${BaseStackName}', [System.EnvironmentVariableTarget]::Machine)"
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_JOINACCOUNT', '${JoinAccount}', [System.EnvironmentVariableTarget]::Machine)"
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_JOINACCOUNTPW', '${JoinAccountPassword}', [System.EnvironmentVariableTarget]::Machine)"
+          Powershell -Command "[System.Environment]::SetEnvironmentVariable('AWS_ADNAME', '${ADDirectoryName}', [System.EnvironmentVariableTarget]::Machine)"
+
+          ## process commands/packages/etc specified in the cfn metadata for this instance
+          Powershell -Command "cfn-init.exe -v --stack ${AWS::StackId} --resource WinServerInstance --region ${AWS::Region} --configsets Default"             
+          </script>
+Outputs:
+  PublicIpForInstance:
+    Description: Public ip for rdp access to the windows host
+    Value:
+      Fn::GetAtt:
+        - WinServerInstance
+        - PublicIp
