@@ -53,7 +53,7 @@ Parameters:
       - 14.00.3356.20.v1 | MSSQL Server 2017
       - 12.00.6329.1.v1  | MSSQL Server 2014
       - 11.00.7493.4.v1  | MSSQL Server 2012
-    Default: 15.00.4073.23.v1
+    Default: 15.00.4073.23.v1 | MSSQL Server 2019
   EnvironmentTag:
     Description: Select to identify use case of this environment - this is helpful for reporting
     Type: String
@@ -95,7 +95,7 @@ Resources:
           - 0
           - Fn::Split:
               - "|"
-              - Ref: InstanceType
+              - Ref: EngineVersion
       LicenseModel: license-included
       MasterUsername:
         Ref: DBUser
