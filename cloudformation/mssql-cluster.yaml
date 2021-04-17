@@ -91,7 +91,11 @@ Resources:
       Engine:
         Ref: MSSQLEdition
       EngineVersion:
-        Ref: EngineVersion
+        Fn::Select:
+          - 0
+          - Fn::Split:
+              - "|"
+              - Ref: InstanceType
       LicenseModel: license-included
       MasterUsername:
         Ref: DBUser

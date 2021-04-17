@@ -373,6 +373,7 @@ Resources:
           Ref: DBStorage
         Domain:
           Ref: ADService
+        EngineVersion: "15.00.4073.23.v1 | MSSQL Server 2019"
         PrivSG:
           Fn::GetAtt:
             - VPC
