@@ -433,6 +433,13 @@ Resources:
   ## START RULE DEFINITIONS OWNED BY THE Public SUBNET SG
   ## =======================================================
   ## Public Subnet SG Base Definition (includes egress)
+  ## INGRESS:
+  ## Allows everything from the prefix you supplied (sourceprefixforbastion)
+  ## Allows everything from corp subnets (includes if you are vpned in)
+  ## Allows everything from the AD Subnets
+  ## Allows everything within itself
+  ## EGRESS:
+  ## Allows everything to everywhere
   Pubsg:
     DependsOn:
       - Privsg
@@ -449,14 +456,15 @@ Resources:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3389
-          ToPort: 3389
+        - IpProtocol: -1
           SourcePrefixListId:
             Fn::FindInMap:
               - PlMap
               - Ref: AWS::Region
               - "corppl"
+        - IpProtocol: -1
+          CidrIp:
+            Ref: SourcePrefixForBastion
         - IpProtocol: -1
           CidrIp:
             Fn::FindInMap:
@@ -473,7 +481,12 @@ Resources:
         Ref: vpc
       Tags:
         - Key: Name
-          Value: BastionSecurityGroup
+          Value:
+            Fn::Join:
+              - ""
+              - - ""
+                - Ref: BaseStackName
+                - "-PubSG"
   ## Ingress Rules from Priv to Public SG
   publicingressrulefromPriv:
     Type: AWS::EC2::SecurityGroupIngress
@@ -520,24 +533,13 @@ Resources:
       SecurityGroupIngress:
         - IpProtocol: -1
           CidrIp:
-            Fn::FindInMap:
-              - SubnetMap
-              - Ref: BaseCIDR
-              - "AzADirectory"
+            Ref: SourcePrefixForBastion
         - IpProtocol: -1
           CidrIp:
-            Fn::FindInMap:
-              - SubnetMap
-              - Ref: BaseCIDR
-              - "AzBDirectory"
-        - IpProtocol: -1
-          CidrIp: 172.17.0.0/23
-        - IpProtocol: -1
-          CidrIp: 99.120.170.0/23
-        - IpProtocol: 1
-          CidrIp: 192.168.0.0/16
-          FromPort: -1
-          ToPort: -1
+            Fn::Join:
+              - "/"
+              - - Ref: BaseCIDR
+                - "24"
   ## Ingress Rules from Public to Priv SG
   PrivingressrulefromPub1:
     Type: AWS::EC2::SecurityGroupIngress

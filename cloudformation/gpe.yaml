@@ -92,7 +92,7 @@ Parameters:
   BastionInstanceType:
     Description: "Windows Bastion Instance Type"
     Type: String
-    Default: t3a.2xlarge
+    Default: g4dn.xlarge
   WindowsAMI:
     Type: String
     Default: "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
@@ -312,7 +312,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
-        VPCName: GPEVPC
+        VPCName: GPE
         BaseCIDR:
           Ref: BaseCIDR
         BaseStackName:

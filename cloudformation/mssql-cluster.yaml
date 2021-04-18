@@ -68,8 +68,17 @@ Resources:
     Type: AWS::RDS::OptionGroup
     Properties:
       EngineName: sqlserver-ee
-      MajorEngineVersion: "15.00"
-      OptionGroupDescription: OptionGroup
+      MajorEngineVersion:
+        Fn::Join:
+          - "."
+          - - Fn::Select:
+                - 0
+                - Fn::Split:
+                    - "."
+                    - Ref: EngineVersion
+            - "00"
+
+      OptionGroupDescription: OptionGroup for MSSQL Enterprise 2019 RDS Instances - MultiAZ Always-On deployment
       OptionConfigurations:
         - OptionName: Mirroring
   DBInstance:
@@ -100,7 +109,7 @@ Resources:
       MasterUserPassword:
         Ref: DBPassword
       OptionGroupName:
-        Ref: OptionGroup
+        Ref: DBOptionGroup
       PreferredBackupWindow: 01:00-03:00
       PreferredMaintenanceWindow: sun:06:00-sun:06:30
       PubliclyAccessible: True
