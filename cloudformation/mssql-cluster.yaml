@@ -64,11 +64,11 @@ Parameters:
       - "SelfStudy"
       - "Development"
 Resources:
-  OptionGroup:
+  DBOptionGroup:
     Type: AWS::RDS::OptionGroup
     Properties:
       EngineName: sqlserver-ee
-      MajorEngineVersion: 15.00
+      MajorEngineVersion: "15.00"
       OptionGroupDescription: OptionGroup
       OptionConfigurations:
         - OptionName: Mirroring
