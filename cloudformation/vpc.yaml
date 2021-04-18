@@ -19,8 +19,18 @@ Parameters:
     ConstraintDescription: Must choose a /24 from this list it will be carved up into multiple /27s
     AllowedValues:
       - 192.168.10.0
+      - 192.168.11.0
+      - 192.168.12.0
+      - 192.168.13.0
+      - 10.1.10.0
+      - 10.1.11.0
+      - 10.1.12.0
+      - 10.1.13.0
       - 172.17.10.0
-    Default: 192.168.10.0
+      - 172.17.11.0
+      - 172.17.12.0
+      - 172.17.13.0
+    Default: 172.17.10.0
   EnvironmentTag:
     Description: Select to identify use case of this environment - this is helpful for reporting
     Type: String
@@ -39,6 +49,55 @@ Mappings:
       "AzBPriv": "192.168.10.192/27"
       "AzADirectory": "192.168.10.96/27"
       "AzBDirectory": "192.168.10.128/27"
+    "192.168.11.0":
+      "AzApublic": "192.168.11.0/27"
+      "AzAPriv": "192.168.11.32/27"
+      "AzBPublic": "192.168.11.160/27"
+      "AzBPriv": "192.168.11.192/27"
+      "AzADirectory": "192.168.11.96/27"
+      "AzBDirectory": "192.168.11.128/27"
+    "192.168.12.0":
+      "AzApublic": "192.168.12.0/27"
+      "AzAPriv": "192.168.12.32/27"
+      "AzBPublic": "192.168.12.160/27"
+      "AzBPriv": "192.168.12.192/27"
+      "AzADirectory": "192.168.12.96/27"
+      "AzBDirectory": "192.168.12.128/27"
+    "192.168.13.0":
+      "AzApublic": "192.168.13.0/27"
+      "AzAPriv": "192.168.13.32/27"
+      "AzBPublic": "192.168.13.160/27"
+      "AzBPriv": "192.168.13.192/27"
+      "AzADirectory": "192.168.13.96/27"
+      "AzBDirectory": "192.168.13.128/27"
+    "10.1.10.0":
+      "AzApublic": "10.1.10.0/27"
+      "AzAPriv": "10.1.10.32/27"
+      "AzBPublic": "10.1.10.160/27"
+      "AzBPriv": "10.1.10.192/27"
+      "AzADirectory": "10.1.10.96/27"
+      "AzBDirectory": "10.1.10.128/27"
+    "10.1.11.0":
+      "AzApublic": "10.1.11.0/27"
+      "AzAPriv": "10.1.11.32/27"
+      "AzBPublic": "10.1.11.160/27"
+      "AzBPriv": "10.1.11.192/27"
+      "AzADirectory": "10.1.11.96/27"
+      "AzBDirectory": "10.1.11.128/27"
+    "10.1.12.0":
+      "AzApublic": "10.1.12.0/27"
+      "AzAPriv": "10.1.12.32/27"
+      "AzBPublic": "10.1.12.160/27"
+      "AzBPriv": "10.1.12.192/27"
+      "AzADirectory": "10.1.12.96/27"
+      "AzBDirectory": "10.1.12.128/27"
+    "10.1.13.0":
+      "AzApublic": "10.1.13.0/27"
+      "AzAPriv": "10.1.13.32/27"
+      "AzBPublic": "10.1.13.160/27"
+      "AzBPriv": "10.1.13.192/27"
+      "AzADirectory": "10.1.13.96/27"
+      "AzBDirectory": "10.1.13.128/27"
     "172.17.10.0":
       "AzApublic": "172.17.10.0/27"
       "AzAPriv": "172.17.10.32/27"
@@ -46,6 +105,27 @@ Mappings:
       "AzBPriv": "172.17.10.192/27"
       "AzADirectory": "172.17.10.96/27"
       "AzBDirectory": "172.17.10.128/27"
+    "172.17.11.0":
+      "AzApublic": "172.17.11.0/27"
+      "AzAPriv": "172.17.11.32/27"
+      "AzBPublic": "172.17.11.160/27"
+      "AzBPriv": "172.17.11.192/27"
+      "AzADirectory": "172.17.11.96/27"
+      "AzBDirectory": "172.17.11.128/27"
+    "172.17.12.0":
+      "AzApublic": "172.17.12.0/27"
+      "AzAPriv": "172.17.12.32/27"
+      "AzBPublic": "172.17.12.160/27"
+      "AzBPriv": "172.17.12.192/27"
+      "AzADirectory": "172.17.12.96/27"
+      "AzBDirectory": "172.17.12.128/27"
+    "172.17.13.0":
+      "AzApublic": "172.17.13.0/27"
+      "AzAPriv": "172.17.13.32/27"
+      "AzBPublic": "172.17.13.160/27"
+      "AzBPriv": "172.17.13.192/27"
+      "AzADirectory": "172.17.13.96/27"
+      "AzBDirectory": "172.17.13.128/27"
   PlMap:
     "us-west-2":
       "corppl": "pl-5aa44133"
