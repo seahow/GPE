@@ -91,8 +91,6 @@ Resources:
         Ref: DBUser
       MasterUserPassword:
         Ref: DBPassword
-      OptionGroupName:
-        Ref: DBOptionGroup
       PreferredBackupWindow: 01:00-03:00
       PreferredMaintenanceWindow: sun:06:00-sun:06:30
       PubliclyAccessible: True
