@@ -183,7 +183,7 @@ Parameters:
   DBPassword:
     Type: String
     Description: Should probably just leave this alone
-    Default: Aws2020@
+    Default: Aws2020Aws2020
   DBUser:
     Type: String
     Description: mssql username
@@ -388,7 +388,7 @@ Resources:
           Ref: DBStorage
         Domain:
           Ref: ADService
-        EngineVersion: 15.00.4073.23.v1 | MSSQL Server 2019
+        EngineVersion: "15.00.4073.23.v1| MSSQL Server 2019"
         PrivateSG:
           Fn::GetAtt:
             - VPC

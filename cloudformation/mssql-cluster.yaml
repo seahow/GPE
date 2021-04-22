@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: GPE v1.0 - RDP-based MSSQL 2019 Multi-AZ
 Parameters:
   Domain:
+    Default: d-92670fd94c
     Type: String
   DBInstanceClass:
     Default: db.r5b.xlarge
@@ -9,20 +10,18 @@ Parameters:
     Type: String
   DBPassword:
     ConstraintDescription: must contain only alphanumeric characters.
-    Default: Aws2020@
+    Default: dbadminpassword
     Description: The database admin account password
-    NoEcho: "true"
     Type: String
   DBUser:
     AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
     ConstraintDescription:
       must begin with a letter and contain only alphanumeric
       characters.
-    Default: sqluser
+    Default: dbadmin
     Description: The database admin account username
     MaxLength: "16"
     MinLength: "1"
-    NoEcho: "true"
     Type: String
   DBStorage:
     Default: "100"
@@ -49,11 +48,11 @@ Parameters:
   EngineVersion:
     Type: String
     AllowedValues:
-      - 15.00.4073.23.v1 | MSSQL Server 2019
-      - 14.00.3356.20.v1 | MSSQL Server 2017
-      - 12.00.6329.1.v1  | MSSQL Server 2014
-      - 11.00.7493.4.v1  | MSSQL Server 2012
-    Default: 15.00.4073.23.v1 | MSSQL Server 2019
+      - "15.00.4073.23.v1| MSSQL Server 2019"
+      - "14.00.3356.20.v1| MSSQL Server 2017"
+      - "12.00.6329.1.v1|  MSSQL Server 2014"
+      - "11.00.7493.4.v1|  MSSQL Server 2012"
+    Default: "15.00.4073.23.v1| MSSQL Server 2019"
   EnvironmentTag:
     Description: Select to identify use case of this environment - this is helpful for reporting
     Type: String
