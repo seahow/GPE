@@ -1,0 +1,6 @@
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:098691624503:stack/EAST-GPE-43/c80c6e90-a47c-11eb-99d8-0ee1cf96ccc3"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST-GPE-21/c8f547f0-a47c-11eb-828a-0a00de9510d3"
+}
