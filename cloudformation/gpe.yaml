@@ -401,7 +401,7 @@ Outputs:
     Value:
       Fn::GetAtt:
         - VPC
-        - Outputs.aPublicrt
+        - Outputs.PublicRT
     Export:
       Name:
         Fn::Sub: "${AWS::StackName}-PublicRouteTable"
@@ -410,19 +410,46 @@ Outputs:
     Value:
       Fn::GetAtt:
         - VPC
-        - Outputs.aPrivatert
+        - Outputs.PrivateRT
     Export:
       Name:
         Fn::Sub: "${AWS::StackName}-PrivateRouteTable"
-  PrivSubnet:
-    Description: Priv Subnet
+  PrivSubnetA:
+    Description: Priv Subnet (AZ A)
     Value:
       Fn::GetAtt:
         - VPC
         - Outputs.aPriv
     Export:
       Name:
-        Fn::Sub: "${AWS::StackName}-Subnet"
+        Fn::Sub: "${AWS::StackName}-Private-Subnet-AZ-A"
+  PrivSubnetB:
+    Description: Priv Subnet (AZ B)
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.bPriv
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-Private-Subnet-AZ-B"
+  PubSubnetA:
+    Description: Public Subnet (AZ A)
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.aPublic
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-Public-Subnet-AZ-A"
+  PubSubnetB:
+    Description: Public Subnet (AZ B)
+    Value:
+      Fn::GetAtt:
+        - VPC
+        - Outputs.bPublic
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-Public-Subnet-AZ-B"
   PrivSecurityGroup:
     Description: Priv Security Group
     Value:
