@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: GPE v1.0 - MS Managed Active Directory
+Description: GPE v1.1a - MS Managed Active Directory
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id

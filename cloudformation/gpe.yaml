@@ -38,13 +38,6 @@ Metadata:
           default: Advanced
         Parameters:
           - NameSalt
-      - Label:
-          default: RDS DB
-        Parameters:
-          - DBInstanceClass
-          - DBPassword
-          - DBUser
-          - DBStorage
     ParameterLabels:
       WindowsPVSize:
         default: Size in GB of the Windows bastion host's C:\ drive
@@ -76,14 +69,6 @@ Metadata:
         default: S3 Bucket containing dependencies of this solution
       S3Path:
         default: S3 Prefix/Directory where the root of our content tree lives
-      DBInstanceClass:
-        default: Database instance node size
-      DBPassword:
-        default: Password for dbadmin/sa account
-      DBUser:
-        default: Username for dbadmin/sa account
-      DBStorage:
-        default: Size in GB of DB instance
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair
@@ -176,22 +161,6 @@ Parameters:
     Type: String
     Description: Only needed if you plan to deploy this stack multiple times to the same account
     Default: 00
-  DBInstanceClass:
-    Type: String
-    Description: Must be of type db.xx.xx
-    Default: db.r5b.xlarge
-  DBPassword:
-    Type: String
-    Description: Should probably just leave this alone
-    Default: Aws2020@
-  DBUser:
-    Type: String
-    Description: mssql username
-    Default: dbadmin
-  DBStorage:
-    Type: String
-    Description: Initial Size
-    Default: 100
 Resources:
   GPERole:
     Type: AWS::IAM::Role
@@ -364,42 +333,6 @@ Resources:
             - Ref: S3Bucket
             - Ref: S3Path
             - "cloudformation/active-directory.yaml"
-  RDSDB:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      Parameters:
-        PrivateSubnet1:
-          Fn::GetAtt:
-            - VPC
-            - Outputs.aPriv
-        PrivateSubnet2:
-          Fn::GetAtt:
-            - VPC
-            - Outputs.bPriv
-        EnvironmentTag:
-          Ref: EnvironmentTag
-        DBInstanceClass:
-          Ref: DBInstanceClass
-        DBPassword:
-          Ref: DomainAdminPassword
-        DBUser:
-          Ref: DBUser
-        DBStorage:
-          Ref: DBStorage
-        Domain:
-          Ref: ADService
-        EngineVersion: 15.00.4073.23.v1 | MSSQL Server 2019
-        PrivateSG:
-          Fn::GetAtt:
-            - VPC
-            - Outputs.Privsg
-      TemplateURL:
-        Fn::Join:
-          - /
-          - - "https://s3.amazonaws.com"
-            - Ref: S3Bucket
-            - Ref: S3Path
-            - "cloudformation/mssql-cluster.yaml"
   BastionInstance:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -453,7 +386,6 @@ Resources:
             - Ref: S3Bucket
             - Ref: S3Path
             - "cloudformation/bastion.yaml"
-
 Outputs:
   BastionPublicIp:
     Description: Public ip for rdp access to the windows host

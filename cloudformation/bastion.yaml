@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: GPE v1.0 - Windows 2019 Server Bastion
+Description: GPE v1.1a - Windows 2019 Server Bastion
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

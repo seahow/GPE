@@ -9,22 +9,6 @@
             "ParameterValue": "BASECIDRPLACEHOLDER"
         },
         {
-            "ParameterKey": "DBInstanceClass",
-            "ParameterValue": "DBINSTANCECLASSPLACEHOLDER"
-        },
-        {
-            "ParameterKey": "DBPassword",
-            "ParameterValue": "DBPASSWORDPLACEHOLDER"
-        },
-        {
-            "ParameterKey": "DBUser",
-            "ParameterValue": "DBUSERPLACEHOLDER"
-        },
-        {
-            "ParameterKey": "DBStorage",
-            "ParameterValue": "DBSTORAGEPLACEHOLDER"
-        },
-        {
             "ParameterKey": "SourcePrefixForBastion",
             "ParameterValue": "99.120.170.0/23"
         },
