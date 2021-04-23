@@ -386,7 +386,6 @@ Resources:
             - Ref: S3Bucket
             - Ref: S3Path
             - "cloudformation/bastion.yaml"
-
 Outputs:
   BastionPublicIp:
     Description: Public ip for rdp access to the windows host
