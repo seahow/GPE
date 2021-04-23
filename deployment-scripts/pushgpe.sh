@@ -48,6 +48,10 @@
 #
 # ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n LAB --o allow
 # ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n LAB --o allow --x 172.17.10.0
+#
+# multi-region harness:
+# ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n EAST --o allow --x 172.17.10.0
+# ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n WEST --o allow --x 172.17.11.0
 
 FILEBASE="../"
 S3BUCKET="centralsa-labs"
