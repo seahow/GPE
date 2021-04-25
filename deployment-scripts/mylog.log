@@ -10,3 +10,9 @@
 {
     "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST-GPE-A2/3b224120-a47d-11eb-860f-0a78ea54322b"
 }
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:098691624503:stack/EAST-GPE-13/53c9d040-a486-11eb-842f-0a13a71c396d"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST-GPE-14/54a8e5a0-a486-11eb-a4af-0a29b26acfc7"
+}
