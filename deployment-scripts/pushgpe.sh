@@ -3,6 +3,15 @@
 # NOTE:  You must create a profile called shared under ~/.aws
 # arguments (all are optional):
 #
+# --a = AD Domain
+#      [default: example.local]
+#
+# --b = NETBIOS for AD
+#      [default: EXAMPLE]
+#
+# --y = AD Password
+#      [default: Aws2020@]
+#
 # --r = AWS Region
 #      [default: us-east-1]
 #
@@ -50,8 +59,8 @@
 # ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n LAB --o allow --x 172.17.10.0
 #
 # multi-region harness:
-# ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n EAST --o allow --x 172.17.10.0
-# ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n WEST --o allow --x 172.17.11.0
+# ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n EAST --o allow --x 172.17.10.0 --a east1.byod --b EAST1 --y Aws2020@
+# ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n WEST --o allow --x 172.17.11.0 --a west2.byod --b WEST2 --y Aws2020@
 
 FILEBASE="../"
 S3BUCKET="centralsa-labs"
@@ -59,6 +68,9 @@ S3PREFIX="gpe"
 
 # Set your defaults here
 
+a=${a:-example.local}
+b=${b:-EXAMPLE}
+y=${y:-Password123}
 r=${r:-us-east-1}
 t=${t:-Eastern}
 c=${c:-nocomment}

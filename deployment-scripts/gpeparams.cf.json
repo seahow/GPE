@@ -1,6 +1,14 @@
 {
     "Parameters": [
         {
+            "ParameterKey": "DomainNetBIOSName",
+            "ParameterValue": "DOMAINNETBIOSNAMEPLACEHOLDER"
+        },
+        {
+            "ParameterKey": "DomainDNSName",
+            "ParameterValue": "DOMAINDNSNAMEPLACEHOLDER"
+        },
+        {
             "ParameterKey": "NameSalt",
             "ParameterValue": "NAMESALTPLACEHOLDER"
         },
