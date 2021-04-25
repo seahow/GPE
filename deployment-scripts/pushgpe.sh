@@ -59,8 +59,8 @@
 # ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n LAB --o allow --x 172.17.10.0
 #
 # multi-region harness:
-# ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n EAST --o allow --x 172.17.10.0 --a east1.byod --b EAST1 --y Aws2020@
-# ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n WEST --o allow --x 172.17.11.0 --a west2.byod --b WEST2 --y Aws2020@
+# ./pushgpe.sh --r us-east-1 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing --b centralsa-labs --p gpe --n EAST --o allow --x 172.17.10.0 --a east1.byod --z EAST1 --y Aws2020@
+# ./pushgpe.sh --r us-west-2 --c "GPE v1.1a" --i g4dn.xlarge --t Central --k l0-testing-oregon --b centralsa-labs --p gpe --n WEST --o allow --x 172.17.11.0 --a west2.byod --z WEST2 --y Aws2020@
 
 FILEBASE="../"
 S3BUCKET="centralsa-labs"
@@ -69,7 +69,7 @@ S3PREFIX="gpe"
 # Set your defaults here
 
 a=${a:-example.local}
-b=${b:-EXAMPLE}
+z=${b:-EXAMPLE}
 y=${y:-Password123}
 r=${r:-us-east-1}
 t=${t:-Eastern}
@@ -93,7 +93,7 @@ while [ $# -gt 0 ]; do
 done
 
 RANDNAME=$(openssl rand -hex 1 | tr [:lower:] [:upper:])
-JSON=$(cat gpeparams.cf.json | sed "s/DOMAINDNSNAMEPLACEHOLDER/$a/g; s/DOMAINNETBIOSNAMEPLACEHOLDER/$b/g; s/DOMAINADMINPASSWORDPLACEHOLDER/$y/g; s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/BASECIDRPLACEHOLDER/$x/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g")
+JSON=$(cat gpeparams.cf.json | sed "s/DOMAINDNSNAMEPLACEHOLDER/$a/g; s/DOMAINNETBIOSNAMEPLACEHOLDER/$z/g; s/DOMAINADMINPASSWORDPLACEHOLDER/$y/g; s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/BASECIDRPLACEHOLDER/$x/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g")
 
 if [[ $o == "suppress" ]]; then
      aws cloudformation create-stack --capabilities "CAPABILITY_NAMED_IAM" "CAPABILITY_IAM" --tags Key="comment",Value="$c" --stack-name "$n-GPE-$RANDNAME" --cli-input-json "$JSON" --region $r --template-url https://s3.amazonaws.com/$S3BUCKET/$S3PREFIX/cloudformation/gpe.yaml --profile=shared >>./mylog.log
