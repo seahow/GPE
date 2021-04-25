@@ -17,3 +17,9 @@
     "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST-GPE-14/54a8e5a0-a486-11eb-a4af-0a29b26acfc7"
 }
 
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:098691624503:stack/EAST1-GPE-1A/15c53f40-a5a4-11eb-a37b-0a773b285c67"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST2-GPE-5B/1691b700-a5a4-11eb-a924-0a4ff46eb113"
+}

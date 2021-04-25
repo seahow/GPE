@@ -9,6 +9,10 @@
             "ParameterValue": "DOMAINDNSNAMEPLACEHOLDER"
         },
         {
+            "ParameterKey": "DomainAdminPassword",
+            "ParameterValue": "DOMAINADMINPASSWORDPLACEHOLDER"
+        },
+        {
             "ParameterKey": "NameSalt",
             "ParameterValue": "NAMESALTPLACEHOLDER"
         },

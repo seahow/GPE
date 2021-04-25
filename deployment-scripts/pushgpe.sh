@@ -93,7 +93,7 @@ while [ $# -gt 0 ]; do
 done
 
 RANDNAME=$(openssl rand -hex 1 | tr [:lower:] [:upper:])
-JSON=$(cat gpeparams.cf.json | sed "s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/BASECIDRPLACEHOLDER/$x/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g")
+JSON=$(cat gpeparams.cf.json | sed "s/DOMAINDNSNAMEPLACEHOLDER/$a/g; s/DOMAINNETBIOSNAMEPLACEHOLDER/$b/g; s/DOMAINADMINPASSWORDPLACEHOLDER/$y/g; s/NAMESALTPLACEHOLDER/$RANDNAME/g; s/BASECIDRPLACEHOLDER/$x/g; s/S3BUCKETPLACEHOLDER/$b/g; s/KEYPAIRPLACEHOLDER/$k/g; s/S3PATHPLACEHOLDER/$p/g; s/INSTANCETYPEPLACEHOLDER/$i/g; s/INSTANCETYPEPLACEHOLDER/$t/g; s/TIMEZONEPLACEHOLDER/$t/g")
 
 if [[ $o == "suppress" ]]; then
      aws cloudformation create-stack --capabilities "CAPABILITY_NAMED_IAM" "CAPABILITY_IAM" --tags Key="comment",Value="$c" --stack-name "$n-GPE-$RANDNAME" --cli-input-json "$JSON" --region $r --template-url https://s3.amazonaws.com/$S3BUCKET/$S3PREFIX/cloudformation/gpe.yaml --profile=shared >>./mylog.log
