@@ -1,0 +1,12 @@
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:098691624503:stack/EAST-GPE-AE/617ad9c0-b13b-11eb-83c6-0a8858a4ea55"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:098691624503:stack/WEST-GPE-24/6277d760-b13b-11eb-845d-0284b18a205f"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:155606225553:stack/EAST-GPE-E0/58766810-b21e-11eb-a000-0ae28d89ba2b"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-4E/59572b20-b21e-11eb-a105-06d46ccf9475"
+}
