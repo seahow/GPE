@@ -10,3 +10,21 @@
 {
     "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-4E/59572b20-b21e-11eb-a105-06d46ccf9475"
 }
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:155606225553:stack/EAST-GPE-2E/d3433720-b21f-11eb-8d1b-0ada7ccc8ac7"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-92/d4290340-b21f-11eb-96a5-0a8b5d827c39"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:155606225553:stack/EAST-GPE-BD/2fa24010-b2b1-11eb-810f-0a2d95c2b2ab"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-62/30a88c80-b2b1-11eb-ba0c-0abb512a1f57"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:155606225553:stack/EAST-GPE-B3/5e75ff40-b2dd-11eb-8e75-120022ae60fd"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-E7/5f9e52a0-b2dd-11eb-be69-0a1401c4ef51"
+}

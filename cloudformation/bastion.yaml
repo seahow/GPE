@@ -287,14 +287,16 @@ Resources:
                   cinst winscp.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.winscp.log
                   cinst putty.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.putty.log
                   cinst winsshterm -y -r --no-progress --log-file .\\chocologs\\chocopackage.winssh.log
-                  cinst vmrc -y -r --no-progress --log-file .\\chocologs\\chocopackage.vmrc.log
-                  cinst vmware-powercli-psmodule -y -r --no-progress --log-file .\\chocologs\\chocopackage.powercli.log
                   cinst notepadplusplus.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.notepadplusplus.log              
                   cinst vscode -y -r --no-progress --log-file .\\chocologs\\chocopackage.vscode.log
                   cinst royalts-v5 -y -r --no-progress --log-file .\\chocologs\\chocopackage.royalts.log
                   cinst wget -y -r --no-progress --log-file .\\chocologs\\chocopackage.wget.log 
                   cinst sysinternals -y -r --no-progress --log-file .\\chocologs\\chocopackage.sysinternals.log
                   cinst windows-admin-center -y -r --no-progress --log-file .\\chocologs\\chocopackage.windows-admin-center.log
+                  cinst advanced-ip-scanner -y -r --no-progress --log-file .\\chocologs\\chocopackage.advanced-ip-scanner.log
+                  cinst choco-cleaner -y -r --no-progress --log-file .\\chocologs\\chocopackage.choco-cleaner.log
+                  cinst patchcleaner -y -r --no-progress --log-file .\\chocologs\\chocopackage.patchcleaner.log
+                  
                 ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
                   exit
 
