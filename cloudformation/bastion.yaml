@@ -289,13 +289,13 @@ Resources:
                   cinst winsshterm -y -r --no-progress --log-file .\\chocologs\\chocopackage.winssh.log
                   cinst notepadplusplus.install -y -r --no-progress --log-file .\\chocologs\\chocopackage.notepadplusplus.log              
                   cinst vscode -y -r --no-progress --log-file .\\chocologs\\chocopackage.vscode.log
-                  cinst royalts-v5 -y -r --no-progress --log-file .\\chocologs\\chocopackage.royalts.log
                   cinst wget -y -r --no-progress --log-file .\\chocologs\\chocopackage.wget.log 
                   cinst sysinternals -y -r --no-progress --log-file .\\chocologs\\chocopackage.sysinternals.log
                   cinst windows-admin-center -y -r --no-progress --log-file .\\chocologs\\chocopackage.windows-admin-center.log
                   cinst advanced-ip-scanner -y -r --no-progress --log-file .\\chocologs\\chocopackage.advanced-ip-scanner.log
                   cinst choco-cleaner -y -r --no-progress --log-file .\\chocologs\\chocopackage.choco-cleaner.log
                   cinst patchcleaner -y -r --no-progress --log-file .\\chocologs\\chocopackage.patchcleaner.log
+                  cinst bginfo -y -r --no-progress --log-file .\\chocologs\\chocopackage.bginfo.log
                   
                 ## ideally you should explicitly exit .ps1 scripts when running under cfn-init
                   exit
@@ -341,14 +341,14 @@ Resources:
                   Import-StartLayout -LayoutPath c:\\bootstrap\\layout.xml -MountPath c:\
 
                 ## Overwrite default system wallpaper
-                  takeown /f c:\windows\WEB\wallpaper\Windows\img0.jpg
-                  takeown /f C:\Windows\Web\4K\Wallpaper\Windows\*.*
-                  icacls c:\windows\WEB\wallpaper\Windows\img0.jpg /Grant 'Everyone:(F)'
-                  icacls C:\Windows\Web\4K\Wallpaper\Windows\*.* /Grant 'Everyone:(F)'
-                  Remove-Item c:\windows\WEB\wallpaper\Windows\img0.jpg
-                  Remove-Item C:\Windows\Web\4K\Wallpaper\Windows\*.*
-                  Copy-Item C:\bootstrap\bastion\wallpaper\img0.jpg c:\windows\WEB\wallpaper\Windows\img0.jpg
-                  Copy-Item C:\bootstrap\bastion\wallpaper\4k\*.* C:\Windows\Web\4K\Wallpaper\Windows
+                  # takeown /f c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  # takeown /f C:\Windows\Web\4K\Wallpaper\Windows\*.*
+                  # icacls c:\windows\WEB\wallpaper\Windows\img0.jpg /Grant 'Everyone:(F)'
+                  # icacls C:\Windows\Web\4K\Wallpaper\Windows\*.* /Grant 'Everyone:(F)'
+                  # Remove-Item c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  # Remove-Item C:\Windows\Web\4K\Wallpaper\Windows\*.*
+                  # Copy-Item C:\bootstrap\bastion\wallpaper\img0.jpg c:\windows\WEB\wallpaper\Windows\img0.jpg
+                  # Copy-Item C:\bootstrap\bastion\wallpaper\4k\*.* C:\Windows\Web\4K\Wallpaper\Windows
 
                 ## Set Windows Explorer options
                   Import-Module Boxstarter.Chocolatey

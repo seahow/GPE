@@ -1,0 +1,1826 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  "(SO0001) - Transit VPC: This template creates a dedicated transit VPC
+  with Cisco CSRs for routing traffic. ***NOTE*** You must first subscribe to the
+  appropriate Cisco CSR marketplace BYOL or License Included AMI from the AWS Marketplace
+  before you launch this template. version v5.3.2"
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: Lab
+  TerminationProtection:
+    Description:
+      Enable termination protection on the CSR EC2 instances to avoid accidential
+      CSR termination?
+    Type: String
+    Default: "Yes"
+    AllowedValues:
+      - "Yes"
+      - "No"
+  PreferredPathTag:
+    Description:
+      Tag to use to configure a preferred CSR VPN endpoint to control traffic
+      flow through the Transit VPC CSRs (e.g. when integrating with stateful on-prem
+      firewalls).
+    Type: String
+    Default: transitvpc:preferred-path
+  SpokeTag:
+    Description: Tag to use to identify spoke VPCs to connect to Transit VPC.
+    Type: String
+    Default: transitvpc:spoke
+  SpokeTagValue:
+    Description: Tag value to use to identify spoke VPCs to connect to Transit VPC.
+    Type: String
+    Default: "true"
+  BgpAsn:
+    Description: BGP ASN to use for Transit VPC.
+    Type: String
+    Default: "64525"
+  VpcCidr:
+    Description: CIDR block for Transit VPC.
+    Type: String
+    Default: 100.64.127.224/27
+  PubSubnet1:
+    Description: Address range for Transit VPC subnet to be created in AZ1.
+    Type: String
+    Default: 100.64.127.224/28
+  PubSubnet2:
+    Description: Address range for Transit VPC subnet to be created in AZ2.
+    Type: String
+    Default: 100.64.127.240/28
+  CSRType:
+    Description: Maximum network througput required for CSR instances.
+    Type: String
+    Default: 2x500Mbps
+    AllowedValues:
+      - 2x500Mbps
+      - 2x1Gbps
+      - 2x2Gbps
+      - 2x4.5Gbps
+  LicenseModel:
+    Description:
+      Choose between BYOL (Bring Your Own License) and License Included
+      license models. Remember to first subscribe the the appropriate Marketplace
+      AMI!
+    Type: String
+    Default: LicenseIncluded
+    AllowedValues:
+      - LicenseIncluded
+      - BYOL
+  S3Prefix:
+    Description: S3 prefix to append before S3 key names.
+    Type: String
+    Default: vpnconfigs/
+    AllowedPattern: "^[a-zA-Z0-9_\\-/.]*/$"
+  AccountId:
+    Description:
+      Another AWS Account ID to authorize access to VPN Config S3 bucket
+      (for example bucket and KMS key policies).
+    Type: String
+    Default: ""
+  PubSubnet1AZ:
+    Description: "Optional: Availability Zone number for Public Subnet1."
+    Type: String
+    Default: "0"
+    AllowedValues:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+  PubSubnet2AZ:
+    Description: "Optional: Availability Zone number for Public Subnet2."
+    Type: String
+    Default: "1"
+    AllowedValues:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+Conditions:
+  AuthorizeAnotherAccount:
+    Fn::Not:
+      - Fn::Equals:
+          - Ref: AccountId
+          - ""
+  EnableTerm:
+    Fn::Equals:
+      - Ref: TerminationProtection
+      - "Yes"
+  NewRegionTrue:
+    Fn::Equals:
+      - Ref: AWS::Region
+      - eu-west-3
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Cisco CSR Configuration
+        Parameters:
+          - CSRType
+          - KeyName
+          - LicenseModel
+          - TerminationProtection
+      - Label:
+          default: AWS Service Configuration
+        Parameters:
+          - S3Prefix
+          - AccountId
+      - Label:
+          default: Network Configuration
+        Parameters:
+          - VpcCidr
+          - PubSubnet1
+          - PubSubnet2
+          - BgpAsn
+          - SpokeTag
+          - SpokeTagValue
+          - PreferredPathTag
+      - Label:
+          default: Optional AZ Configuration
+        Parameters:
+          - PubSubnet1AZ
+          - PubSubnet2AZ
+    ParameterLabels:
+      BgpAsn:
+        default: Transit VPC BGP ASN
+      SpokeTag:
+        default: Spoke VPC Tag Name
+      SpokeTagValue:
+        default: Spoke VPC Tag Value
+      PreferredPathTag:
+        default: Preferred VPN Endpoint Tag Name
+      VpcCidr:
+        default: Transit VPC CIDR Block
+      PubSubnet1:
+        default: 1st Subnet Network
+      PubSubnet2:
+        default: 2nd Subnet Network
+      PubSubnet1AZ:
+        default: "1st Subnet AZ #"
+      PubSubnet2AZ:
+        default: "2nd Subnet AZ #"
+      CSRType:
+        default: CSR Throughput Requirements
+      KeyName:
+        default: SSH Key to access CSR
+      S3Prefix:
+        default: Prefix for S3 Objects
+      LicenseModel:
+        default: License Model
+      TerminationProtection:
+        default: Enable Termination Protection
+      AccountId:
+        default: Additional AWS Account ID (Optional)
+Mappings:
+  Function:
+    SolutionHelper:
+      S3Bucket: solutions
+      S3Key: transit-vpc/v5.3.2/transit-vpc-solution-helper.zip
+      Name: transit-vpc-solution-helper
+      Handler: transit_vpc_solution_helper/transit-vpc-solution-helper.lambda_handler
+      Description: "Transit VPC: This function is invoked for custom resources."
+      Runtime: python3.8
+      Timeout: "60"
+      MemorySize: "128"
+    Configurator:
+      S3Bucket: solutions
+      S3Key: transit-vpc/v5.3.2/transit-vpc-push-cisco-config.zip
+      Name: cisco-configurator
+      Handler: transit_vpc_push_cisco_config/lambda_function.lambda_handler
+      Description:
+        "Transit VPC: This function is invoked when a generic VPN configuration
+        is placed in an S3 bucket - it converts the generic information into Cisco
+        IOS specific commands and pushes the config to transit VPC routers."
+      Runtime: python3.8
+      Timeout: "300"
+      MemorySize: "128"
+    Poller:
+      S3Bucket: solutions
+      S3Key: transit-vpc/v5.3.2/transit-vpc-poller.zip
+      Name: vgw-poller
+      Handler: transit-vpc-poller.lambda_handler
+      Description:
+        "Transit VPC: Poller function responsible for identifying specifically
+        tagged VGWs and creating VPN connections to transit VPC."
+      Runtime: python3.8
+      Timeout: "120"
+      MemorySize: "128"
+    Csr:
+      UserName: automate
+      PasswordLength: "15"
+      PrivateKey: prikey.pem
+      PublicKey: pubkey.pem
+  CiscoCsrAMI:
+    ap-south-1:
+      BYOL: ami-00543ec5f37dbe4b7
+      LicenseIncluded: ami-0a02c559bdf1bee46
+    eu-west-3:
+      BYOL: ami-0424769ba0620ab86
+      LicenseIncluded: ami-09daac3761e22fa64
+    eu-west-2:
+      BYOL: ami-013da819f1901fa98
+      LicenseIncluded: ami-073da297c9fa1e325
+    eu-west-1:
+      BYOL: ami-03b19a1f6f34c9ee0
+      LicenseIncluded: ami-0355d7892fcafb3ce
+    ap-northeast-2:
+      BYOL: ami-0ea46cb656566cf94
+      LicenseIncluded: ami-05b8ee6bbdb3d7887
+    ap-northeast-1:
+      BYOL: ami-01dcfa7774d7970ec
+      LicenseIncluded: ami-08316d08348d0a9d7
+    sa-east-1:
+      BYOL: ami-0c34ed90208723180
+      LicenseIncluded: ami-0564bd6e4b146df79
+    ca-central-1:
+      BYOL: ami-0e925dc68e145a956
+      LicenseIncluded: ami-0a42834976c32974d
+    ap-southeast-1:
+      BYOL: ami-0457ce25738b0bd2f
+      LicenseIncluded: ami-0bfb37947dc1e6cc1
+    ap-southeast-2:
+      BYOL: ami-04ec026dd7d9fe013
+      LicenseIncluded: ami-0c753885c83794609
+    eu-central-1:
+      BYOL: ami-0518e478f5f1f2834
+      LicenseIncluded: ami-05598662389aa95b4
+    us-east-2:
+      BYOL: ami-0f661119da34de2f6
+      LicenseIncluded: ami-077f4573aa77bdf5e
+    us-east-1:
+      BYOL: ami-02dc259ccbfac00e4
+      LicenseIncluded: ami-0bf895b97beacde98
+    us-west-1:
+      BYOL: ami-093178e44ff7d37f7
+      LicenseIncluded: ami-05f8a03b2a8371be2
+    us-west-2:
+      BYOL: ami-0c749a3d7520271aa
+      LicenseIncluded: ami-0f509756bc1a57b06
+  CsrInstance:
+    2x500Mbps:
+      Type: c4.large
+      Bandwidth: "500000"
+    2x1Gbps:
+      Type: c4.xlarge
+      Bandwidth: "1000000"
+    2x2Gbps:
+      Type: c4.2xlarge
+      Bandwidth: "2000000"
+    2x4.5Gbps:
+      Type: c4.4xlarge
+      Bandwidth: "4500000"
+  CsrInstanceForNewRegion:
+    2x500Mbps:
+      Type: c5.large
+      Bandwidth: "500000"
+    2x1Gbps:
+      Type: c5.xlarge
+      Bandwidth: "1000000"
+    2x2Gbps:
+      Type: c5.2xlarge
+      Bandwidth: "2000000"
+    2x4.5Gbps:
+      Type: c5.4xlarge
+      Bandwidth: "4500000"
+  Send:
+    AnonymousUsage:
+      Data: "Yes"
+  LogRetention:
+    Period:
+      Days: 90
+Resources:
+  VPNConfigS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName:
+          Ref: AccessLogBucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  VPNConfigBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: VPNConfigS3Bucket
+      PolicyDocument:
+        Statement:
+          - Sid: DenyUnEncryptedObjectUploads
+            Effect: Deny
+            Principal: "*"
+            Action: s3:PutObject
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+                  - "/"
+                  - Ref: S3Prefix
+                  - "*"
+            Condition:
+              StringNotEquals:
+                s3:x-amz-server-side-encryption: aws:kms
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:PutObjectAcl
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+                  - "/"
+                  - Ref: S3Prefix
+                  - "*"
+            Principal:
+              AWS:
+                - Fn::Join:
+                    - ""
+                    - - "arn:aws:iam::"
+                      - Fn::If:
+                          - AuthorizeAnotherAccount
+                          - Ref: AccountId
+                          - Ref: AWS::AccountId
+                      - ":root"
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: TransitVPC CMK for S3 SSE-KMS
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: transit-vpc-1
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Join:
+                    - ""
+                    - - "arn:aws:iam::"
+                      - Ref: AWS::AccountId
+                      - ":root"
+            Action:
+              - kms:*
+            Resource: "*"
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Join:
+                    - ""
+                    - - "arn:aws:iam::"
+                      - Fn::If:
+                          - AuthorizeAnotherAccount
+                          - Ref: AccountId
+                          - Ref: AWS::AccountId
+                      - ":root"
+                - Fn::GetAtt:
+                    - SolutionHelperRole
+                    - Arn
+                - Fn::GetAtt:
+                    - CiscoConfigFunctionRole
+                    - Arn
+                - Fn::GetAtt:
+                    - TransitVpcPollerRole
+                    - Arn
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
+  KMSKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName:
+        Fn::Join:
+          - ""
+          - - alias/
+            - Ref: AWS::StackName
+            - "-key"
+      TargetKeyId:
+        Ref: KMSKey
+  TransitVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: VpcCidr
+      Tags:
+        - Key: Name
+          Value: Transit VPC
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  VPCPubSub1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TransitVPC
+      CidrBlock:
+        Ref: PubSubnet1
+      AvailabilityZone:
+        Fn::Select:
+          - Ref: PubSubnet1AZ
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: Transit VPC Subnet1
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  VPCPubSub2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TransitVPC
+      CidrBlock:
+        Ref: PubSubnet2
+      AvailabilityZone:
+        Fn::Select:
+          - Ref: PubSubnet2AZ
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: Transit VPC Subnet2
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Transit VPC IGW
+  IGWToInternet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: TransitVPC
+      InternetGatewayId:
+        Ref: IGW
+  VPCRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TransitVPC
+      Tags:
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: Transit VPC
+  VPCPublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: VPCRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: IGW
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:*
+            Resource:
+              - "*"
+      RouteTableIds:
+        - Ref: VPCRouteTable
+      ServiceName:
+        Fn::Join:
+          - ""
+          - - com.amazonaws.
+            - Ref: AWS::Region
+            - ".s3"
+      VpcId:
+        Ref: TransitVPC
+  VPCPubSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: VPCPubSub1
+      RouteTableId:
+        Ref: VPCRouteTable
+  VPCPubSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: VPCPubSub2
+      RouteTableId:
+        Ref: VPCRouteTable
+  CsrEip1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId:
+        Ref: VpcCsr1
+  CsrEip2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId:
+        Ref: VpcCsr2
+  VpcCsr1:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment1: Launch Cisco CSR1
+    Properties:
+      InstanceType:
+        Fn::If:
+          - NewRegionTrue
+          - Fn::FindInMap:
+              - CsrInstanceForNewRegion
+              - Ref: CSRType
+              - Type
+          - Fn::FindInMap:
+              - CsrInstance
+              - Ref: CSRType
+              - Type
+      KeyName:
+        Ref: KeyName
+      DisableApiTermination:
+        Fn::If:
+          - EnableTerm
+          - true
+          - false
+      ImageId:
+        Fn::FindInMap:
+          - CiscoCsrAMI
+          - Ref: AWS::Region
+          - Ref: LicenseModel
+      SubnetId:
+        Ref: VPCPubSub1
+      SecurityGroupIds:
+        - Ref: CSRSecurityGroup
+      Tags:
+        - Key: Name
+          Value: Transit VPC CSR1
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            - - 'ios-config-1="username '
+              - Fn::FindInMap:
+                  - Function
+                  - Csr
+                  - UserName
+              - " priv 15 algorithm-type sha256 secret "
+              - Fn::GetAtt:
+                  - CreateRandomPassword
+                  - Password
+              - "\"\n"
+              - 'ios-config-2="service password-encryption"
+
+                '
+              - 'ios-config-3="crypto isakmp policy 200"
+
+                '
+              - 'ios-config-4="encryption aes 128"
+
+                '
+              - 'ios-config-5="authentication pre-share"
+
+                '
+              - 'ios-config-6="group 2"
+
+                '
+              - 'ios-config-7="lifetime 28800"
+
+                '
+              - 'ios-config-8="hash sha"
+
+                '
+              - 'ios-config-9="crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes
+                128 esp-sha-hmac"
+
+                '
+              - 'ios-config-10="mode tunnel"
+
+                '
+              - 'ios-config-11="crypto ipsec df-bit clear"
+
+                '
+              - 'ios-config-12="crypto isakmp keepalive 10 10 periodic"
+
+                '
+              - 'ios-config-13="crypto ipsec security-association replay window-size
+                1024"
+
+                '
+              - 'ios-config-14="crypto ipsec fragmentation before-encryption"
+
+                '
+              - 'ios-config-15="no crypto ipsec nat-transparency udp-encapsulation"
+
+                '
+              - 'ios-config-16="crypto ipsec profile ipsec-vpn-aws"
+
+                '
+              - 'ios-config-17="set pfs group2"
+
+                '
+              - 'ios-config-18="set security-association lifetime seconds 3600"
+
+                '
+              - 'ios-config-19="set transform-set ipsec-prop-vpn-aws"
+
+                '
+              - 'ios-config-20="router bgp '
+              - Ref: BgpAsn
+              - "\"\n"
+              - 'ios-config-21="bgp log-neighbor-changes"
+
+                '
+              - 'ios-config-22="ip vrf vpn0"
+
+                '
+              - 'ios-config-23="rd '
+              - Ref: BgpAsn
+              - ':0"
+
+                '
+              - 'ios-config-24="ip ssh pubkey-chain"
+
+                '
+              - 'ios-config-25="username '
+              - Fn::FindInMap:
+                  - Function
+                  - Csr
+                  - UserName
+              - "\"\n"
+              - 'ios-config-26="key-hash ssh-rsa '
+              - Fn::GetAtt:
+                  - CreateRsaKey
+                  - Fingerprint
+              - "\"\n"
+              - 'ios-config-27="ip ssh server algorithm authentication publickey"
+
+                '
+              - 'ios-config-28="ip ssh maxstartups 1"
+
+                '
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  VpcCsr2:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment1: Launch Cisco CSR2
+    Properties:
+      InstanceType:
+        Fn::If:
+          - NewRegionTrue
+          - Fn::FindInMap:
+              - CsrInstanceForNewRegion
+              - Ref: CSRType
+              - Type
+          - Fn::FindInMap:
+              - CsrInstance
+              - Ref: CSRType
+              - Type
+      KeyName:
+        Ref: KeyName
+      DisableApiTermination:
+        Fn::If:
+          - EnableTerm
+          - true
+          - false
+      ImageId:
+        Fn::FindInMap:
+          - CiscoCsrAMI
+          - Ref: AWS::Region
+          - Ref: LicenseModel
+      SubnetId:
+        Ref: VPCPubSub2
+      SecurityGroupIds:
+        - Ref: CSRSecurityGroup
+      Tags:
+        - Key: Name
+          Value: Transit VPC CSR2
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            - - 'ios-config-1="username '
+              - Fn::FindInMap:
+                  - Function
+                  - Csr
+                  - UserName
+              - " priv 15 algorithm-type sha256 secret "
+              - Fn::GetAtt:
+                  - CreateRandomPassword
+                  - Password
+              - "\"\n"
+              - 'ios-config-2="service password-encryption"
+
+                '
+              - 'ios-config-3="crypto isakmp policy 200"
+
+                '
+              - 'ios-config-4="encryption aes 128"
+
+                '
+              - 'ios-config-5="authentication pre-share"
+
+                '
+              - 'ios-config-6="group 2"
+
+                '
+              - 'ios-config-7="lifetime 28800"
+
+                '
+              - 'ios-config-8="hash sha"
+
+                '
+              - 'ios-config-9="crypto ipsec transform-set ipsec-prop-vpn-aws esp-aes
+                128 esp-sha-hmac"
+
+                '
+              - 'ios-config-10="mode tunnel"
+
+                '
+              - 'ios-config-11="crypto ipsec df-bit clear"
+
+                '
+              - 'ios-config-12="crypto isakmp keepalive 10 10 periodic"
+
+                '
+              - 'ios-config-13="crypto ipsec security-association replay window-size
+                1024"
+
+                '
+              - 'ios-config-14="crypto ipsec fragmentation before-encryption"
+
+                '
+              - 'ios-config-15="no crypto ipsec nat-transparency udp-encapsulation"
+
+                '
+              - 'ios-config-16="crypto ipsec profile ipsec-vpn-aws"
+
+                '
+              - 'ios-config-17="set pfs group2"
+
+                '
+              - 'ios-config-18="set security-association lifetime seconds 3600"
+
+                '
+              - 'ios-config-19="set transform-set ipsec-prop-vpn-aws"
+
+                '
+              - 'ios-config-20="router bgp '
+              - Ref: BgpAsn
+              - "\"\n"
+              - 'ios-config-21="bgp log-neighbor-changes"
+
+                '
+              - 'ios-config-22="ip vrf vpn0"
+
+                '
+              - 'ios-config-23="rd '
+              - Ref: BgpAsn
+              - ':0"
+
+                '
+              - 'ios-config-24="ip ssh pubkey-chain"
+
+                '
+              - 'ios-config-25="username '
+              - Fn::FindInMap:
+                  - Function
+                  - Csr
+                  - UserName
+              - "\"\n"
+              - 'ios-config-26="key-hash ssh-rsa '
+              - Fn::GetAtt:
+                  - CreateRsaKey
+                  - Fingerprint
+              - "\"\n"
+              - 'ios-config-27="ip ssh server algorithm authentication publickey"
+
+                '
+              - 'ios-config-28="ip ssh maxstartups 1"
+
+                '
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  SolutionHelperRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+  SolutionHelperRolePolicy:
+    Type: AWS::IAM::Policy
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F4
+            reason:
+              This solution utilizes a solution helper function to support the
+              creation/update/deletion of CWE for S3 and custom Lambda functions prior
+              to the ability existing in CloudFormation natively. In order to support
+              these provisioning activities, lambda:* and event:* permissions are required.
+          - id: W12
+            reason: Resource * is needed to describe VPCs, subnets and security groups
+    Properties:
+      Roles:
+        - Ref: SolutionHelperRole
+      PolicyName: Solution_Helper_Permissions
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:logs:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - ":log-group:/aws/lambda/*"
+          - Effect: Allow
+            Action:
+              - s3:PutBucketNotification
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+          - Effect: Allow
+            Action:
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeSubnets
+              - ec2:DescribeVpcs
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+              - lambda:RemovePermission
+              - lambda:AddPermission
+            Resource:
+              Fn::GetAtt:
+                - CiscoConfigFunction
+                - Arn
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource:
+              - Fn::GetAtt:
+                  - CiscoConfigFunctionRole
+                  - Arn
+              - Fn::GetAtt:
+                  - TransitVpcPollerRole
+                  - Arn
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:DeleteObject
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+                  - "/"
+                  - Ref: S3Prefix
+                  - "*"
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: arn:aws:s3:::solutions-reference/*
+  SolutionHelper:
+    Type: AWS::Lambda::Function
+    DependsOn: SolutionHelperRolePolicy
+    Properties:
+      FunctionName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Fn::FindInMap:
+                - Function
+                - SolutionHelper
+                - Name
+      Handler:
+        Fn::FindInMap:
+          - Function
+          - SolutionHelper
+          - Handler
+      Role:
+        Fn::GetAtt:
+          - SolutionHelperRole
+          - Arn
+      Description:
+        Fn::FindInMap:
+          - Function
+          - SolutionHelper
+          - Description
+      Code:
+        S3Bucket:
+          Fn::Join:
+            - ""
+            - - Fn::FindInMap:
+                  - Function
+                  - SolutionHelper
+                  - S3Bucket
+              - "-"
+              - Ref: AWS::Region
+        S3Key:
+          Fn::FindInMap:
+            - Function
+            - SolutionHelper
+            - S3Key
+      Runtime:
+        Fn::FindInMap:
+          - Function
+          - SolutionHelper
+          - Runtime
+      MemorySize:
+        Fn::FindInMap:
+          - Function
+          - SolutionHelper
+          - MemorySize
+      Timeout:
+        Fn::FindInMap:
+          - Function
+          - SolutionHelper
+          - Timeout
+      Environment:
+        Variables:
+          USER_AGENT_STRING: AwsSolution/SO0001/v5.3.2
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason:
+              Lambda functions has the required permission to write CloudWatch
+              Logs. It uses custom policy instead of arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+              with more tighter permissions.
+          - id: W89
+            reason: This lambda function does not need access to VPC resources
+          - id: W92
+            reason: This use case does not need to set the ReservedConcurrentExecutions
+  CreateRsaKey:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      Region:
+        Ref: AWS::Region
+      CreateSshKey:
+        Fn::Join:
+          - ""
+          - - "{ 'Bucket' : '"
+            - Ref: VPNConfigS3Bucket
+            - "', "
+            - "'SSEKMSKeyId' : 'arn:aws:kms:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":key/"
+            - Ref: KMSKey
+            - "', "
+            - "'PrivateKey' : '"
+            - Ref: S3Prefix
+            - Fn::FindInMap:
+                - Function
+                - Csr
+                - PrivateKey
+            - "', "
+            - "'PublicKey' : '"
+            - Ref: S3Prefix
+            - Fn::FindInMap:
+                - Function
+                - Csr
+                - PublicKey
+            - "' "
+            - "}"
+  CreateRandomPassword:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      Region:
+        Ref: AWS::Region
+      CreateRandomPassword:
+        Fn::FindInMap:
+          - Function
+          - Csr
+          - PasswordLength
+      RandomPasswordSpecialCharacters: "False"
+  CiscoConfigFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+  CiscoConfigFunctionRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - Ref: CiscoConfigFunctionRole
+      PolicyName: Cisco_Config_Permissions
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:logs:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - ":log-group:/aws/lambda/*"
+          - Effect: Allow
+            Action:
+              - ec2:CreateNetworkInterface
+              - ec2:DetachNetworkInterface
+              - ec2:DeleteNetworkInterface
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":ec2:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - ":*/*"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeNetworkInterfaces
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+                  - "/"
+                  - Ref: S3Prefix
+                  - "*"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason: Resource * is needed to describe and create network interfaces
+  CiscoConfigFunction:
+    DependsOn:
+      - CiscoConfigFunctionRolePolicy
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Fn::FindInMap:
+                - Function
+                - Configurator
+                - Name
+      Code:
+        S3Bucket:
+          Fn::Join:
+            - ""
+            - - Fn::FindInMap:
+                  - Function
+                  - Configurator
+                  - S3Bucket
+              - "-"
+              - Ref: AWS::Region
+        S3Key:
+          Fn::FindInMap:
+            - Function
+            - Configurator
+            - S3Key
+      MemorySize:
+        Fn::FindInMap:
+          - Function
+          - Configurator
+          - MemorySize
+      Handler:
+        Fn::FindInMap:
+          - Function
+          - Configurator
+          - Handler
+      Role:
+        Fn::GetAtt:
+          - CiscoConfigFunctionRole
+          - Arn
+      Timeout:
+        Fn::FindInMap:
+          - Function
+          - Configurator
+          - Timeout
+      Runtime:
+        Fn::FindInMap:
+          - Function
+          - Configurator
+          - Runtime
+      Description:
+        Fn::FindInMap:
+          - Function
+          - Configurator
+          - Description
+      VpcConfig:
+        SecurityGroupIds:
+          - Ref: CiscoConfigSecurityGroup
+        SubnetIds:
+          - Ref: VPCPubSub1
+          - Ref: VPCPubSub2
+      Environment:
+        Variables:
+          CONFIG_FILE: transit_vpc_config.txt
+          LOG_LEVEL: INFO
+          USER_AGENT_STRING: AwsSolution/SO0001/v5.3.2
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason:
+              Lambda functions has the required permission to write CloudWatch
+              Logs. It uses custom policy instead of arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+              with more tighter permissions.
+          - id: W92
+            reason: This use case does not need to set the ReservedConcurrentExecutions
+  CiscoConfigS3Event:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      AccountId:
+        Ref: AWS::AccountId
+      FunctionName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Fn::FindInMap:
+                - Function
+                - Configurator
+                - Name
+      LambdaArn:
+        Fn::GetAtt:
+          - CiscoConfigFunction
+          - Arn
+      S3Event:
+        Fn::Join:
+          - ""
+          - - "{ 'Bucket' : '"
+            - Ref: VPNConfigS3Bucket
+            - "', "
+            - "'EventPattern' : {"
+            - "'LambdaFunctionConfigurations' : [ {"
+            - "'LambdaFunctionArn': '"
+            - Fn::GetAtt:
+                - CiscoConfigFunction
+                - Arn
+            - "',"
+            - "'Events': ['s3:ObjectCreated:Put' ],"
+            - "'Filter': {"
+            - "'Key': {"
+            - "'FilterRules': [ {"
+            - "'Name': 'prefix',"
+            - "'Value': '"
+            - Ref: S3Prefix
+            - "'"
+            - "}, {"
+            - "'Name': 'suffix',"
+            - "'Value': '.conf'"
+            - "} ] } }"
+            - "} ] }"
+            - "}"
+  TransitVpcS3Config:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      StoreInS3KMS:
+        Fn::Join:
+          - ""
+          - - "[{ 'Bucket' : '"
+            - Ref: VPNConfigS3Bucket
+            - "', "
+            - "'Key' : '"
+            - Ref: S3Prefix
+            - "transit_vpc_config.txt', "
+            - "'SSEKMSKeyId' : 'arn:aws:kms:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":key/"
+            - Ref: KMSKey
+            - "', "
+            - '''Body'': "{'
+            - "'UUID':'"
+            - Fn::GetAtt:
+                - CreateUniqueID
+                - UUID
+            - "',"
+            - "'SENDDATA':'"
+            - Fn::FindInMap:
+                - Send
+                - AnonymousUsage
+                - Data
+            - "',"
+            - "'EIP1':'"
+            - Ref: CsrEip1
+            - "',"
+            - "'EIP2':'"
+            - Ref: CsrEip2
+            - "',"
+            - "'PIP1':'"
+            - Fn::GetAtt:
+                - VpcCsr1
+                - PrivateIp
+            - "',"
+            - "'PIP2':'"
+            - Fn::GetAtt:
+                - VpcCsr2
+                - PrivateIp
+            - "',"
+            - "'BGP_ASN':"
+            - Ref: BgpAsn
+            - ","
+            - "'PREFERRED_PATH_TAG':'"
+            - Ref: PreferredPathTag
+            - "',"
+            - "'HUB_TAG':'"
+            - Ref: SpokeTag
+            - "',"
+            - "'HUB_TAG_VALUE':'"
+            - Ref: SpokeTagValue
+            - "',"
+            - "'USER_NAME':'"
+            - Fn::FindInMap:
+                - Function
+                - Csr
+                - UserName
+            - "',"
+            - "'PRIVATE_KEY':'"
+            - Fn::FindInMap:
+                - Function
+                - Csr
+                - PrivateKey
+            - "',"
+            - "'PUBLIC_KEY':'"
+            - Fn::GetAtt:
+                - CreateRsaKey
+                - PubKey
+            - "',"
+            - "'PASSWORD':'"
+            - Fn::GetAtt:
+                - CreateRandomPassword
+                - Password
+            - "',"
+            - "'KMS_KEY':'arn:aws:kms:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":key/"
+            - Ref: KMSKey
+            - "'"
+            - '}"'
+            - "}]"
+  TransitVpcPollerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+  TransitVpcPollerRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - Ref: TransitVpcPollerRole
+      PolicyName: Transit_VPC_Poller_Function_Permissions
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:logs:"
+                  - Ref: AWS::Region
+                  - ":"
+                  - Ref: AWS::AccountId
+                  - ":log-group:/aws/lambda/*"
+          - Effect: Allow
+            Action:
+              - ec2:CreateTags
+              - ec2:CreateCustomerGateway
+              - ec2:DeleteCustomerGateway
+              - ec2:CreateVpnConnection
+              - ec2:DeleteVpnConnection
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:"
+                  - Ref: AWS::Partition
+                  - ":ec2:*:"
+                  - Ref: AWS::AccountId
+                  - ":*/*"
+          - Effect: Allow
+            Action:
+              - ec2:DescribeRegions
+              - ec2:DescribeVpnGateways
+              - ec2:DescribeVpnConnections
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:PutObjectAcl
+              - s3:GetObject
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: VPNConfigS3Bucket
+                  - "/"
+                  - Ref: S3Prefix
+                  - "*"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W12
+            reason:
+              Resource * is needed to describe and create vpn connections, regions,
+              tags, customer gateways
+  PollerFunction:
+    DependsOn:
+      - TransitVpcPollerRolePolicy
+      - CiscoConfigFunction
+      - TransitVpcS3Config
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName:
+        Fn::Join:
+          - "-"
+          - - Ref: AWS::StackName
+            - Fn::FindInMap:
+                - Function
+                - Poller
+                - Name
+      Code:
+        S3Bucket:
+          Fn::Join:
+            - ""
+            - - Fn::FindInMap:
+                  - Function
+                  - Poller
+                  - S3Bucket
+              - "-"
+              - Ref: AWS::Region
+        S3Key:
+          Fn::FindInMap:
+            - Function
+            - Poller
+            - S3Key
+      MemorySize:
+        Fn::FindInMap:
+          - Function
+          - Poller
+          - MemorySize
+      Handler:
+        Fn::FindInMap:
+          - Function
+          - Poller
+          - Handler
+      Role:
+        Fn::GetAtt:
+          - TransitVpcPollerRole
+          - Arn
+      Timeout:
+        Fn::FindInMap:
+          - Function
+          - Poller
+          - Timeout
+      Runtime:
+        Fn::FindInMap:
+          - Function
+          - Poller
+          - Runtime
+      Description:
+        Fn::FindInMap:
+          - Function
+          - Poller
+          - Description
+      Environment:
+        Variables:
+          BUCKET_NAME:
+            Ref: VPNConfigS3Bucket
+          BUCKET_PREFIX:
+            Ref: S3Prefix
+          CONFIG_FILE: transit_vpc_config.txt
+          LOG_LEVEL: INFO
+          USER_AGENT_STRING: AwsSolution/SO0001/v5.3.2
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W58
+            reason:
+              Lambda functions has the required permission to write CloudWatch
+              Logs. It uses custom policy instead of arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+              with more tighter permissions.
+          - id: W89
+            reason: This lambda function does not need access to VPC resources
+          - id: W92
+            reason: This use case does not need to set the ReservedConcurrentExecutions
+  PollerEvent:
+    Type: AWS::Events::Rule
+    Properties:
+      Description:
+        "Transit VPC: Rule to trigger VGW-Poller every minute to find VGWs
+        that need to be attached to the transit VPC."
+      ScheduleExpression: cron(* * * * ? *)
+      State: ENABLED
+      Targets:
+        - Id:
+            Fn::Join:
+              - "-"
+              - - Ref: AWS::StackName
+                - VGW-Poller-1min
+          Arn:
+            Fn::GetAtt:
+              - PollerFunction
+              - Arn
+  PermissionForPollerEvent:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: PollerFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - PollerEvent
+          - Arn
+  CSRSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: CSR Security Group Rules
+      VpcId:
+        Ref: TransitVPC
+      SecurityGroupIngress:
+        - Description: Security rule for for inbound TCP traffic
+          IpProtocol: tcp
+          FromPort: "22"
+          ToPort: "22"
+          SourceSecurityGroupId:
+            Ref: CiscoConfigSecurityGroup
+      SecurityGroupEgress:
+        - Description: Security Rule for outbound traffic
+          IpProtocol: "-1"
+          FromPort: "0"
+          ToPort: "65535"
+          CidrIp: 0.0.0.0/0
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W40
+            reason:
+              IpProtocol -1 used to allow all traffic. We recommend that you review
+              the security groups and further restrict access as needed once the deployment
+              is up and running
+          - id: W5
+            reason: Open CIDR used to connect to any VPC.
+          - id: W29
+            reason: Port range used to allow for transit vpc traffic.
+  CiscoConfigSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Transit VPC Automation Security Group Rules
+      VpcId:
+        Ref: TransitVPC
+      SecurityGroupEgress:
+        - Description: Security rule for outbound TCP traffic
+          IpProtocol: tcp
+          FromPort: "443"
+          ToPort: "443"
+          CidrIp: 0.0.0.0/0
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W5
+            reason: Open CIDR used to allow api calls from lambda function.
+  SSHtoCSR:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Egress Security rule
+      IpProtocol: tcp
+      FromPort: "22"
+      ToPort: "22"
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - CSRSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - CiscoConfigSecurityGroup
+          - GroupId
+  CSR1RecoveryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription:
+        Trigger a recovery when CSR1 instance status check fails for
+        15 consecutive minutes.
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed_System
+      Statistic: Minimum
+      Period: "60"
+      EvaluationPeriods: "15"
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: "0"
+      AlarmActions:
+        - Fn::Join:
+            - ""
+            - - "arn:aws:automate:"
+              - Ref: AWS::Region
+              - ":ec2:recover"
+      Dimensions:
+        - Name: InstanceId
+          Value:
+            Ref: VpcCsr1
+  CSR2RecoveryAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription:
+        Trigger a recovery when CSR2 instance status check fails for
+        15 consecutive minutes.
+      Namespace: AWS/EC2
+      MetricName: StatusCheckFailed_System
+      Statistic: Minimum
+      Period: "60"
+      EvaluationPeriods: "15"
+      ComparisonOperator: GreaterThanThreshold
+      Threshold: "0"
+      AlarmActions:
+        - Fn::Join:
+            - ""
+            - - "arn:aws:automate:"
+              - Ref: AWS::Region
+              - ":ec2:recover"
+      Dimensions:
+        - Name: InstanceId
+          Value:
+            Ref: VpcCsr2
+  CreateUniqueID:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      Region:
+        Ref: AWS::Region
+      CreateUniqueID: "true"
+  SendingData:
+    Type: Custom::LoadLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - SolutionHelper
+          - Arn
+      SendAnonymousData:
+        Fn::Join:
+          - ""
+          - - "{ 'Solution' : '"
+            - SO0001
+            - "', "
+            - "'UUID' : '"
+            - Fn::GetAtt:
+                - CreateUniqueID
+                - UUID
+            - "', "
+            - "'Data': {"
+            - "'CSRType': '"
+            - Ref: CSRType
+            - "',"
+            - "'LicenseModel': '"
+            - Ref: LicenseModel
+            - "',"
+            - "'TerminationProtection': '"
+            - Ref: TerminationProtection
+            - "',"
+            - "'CreateVPC': 'Yes',"
+            - "'SendAnonymousData': '"
+            - Fn::FindInMap:
+                - Send
+                - AnonymousUsage
+                - Data
+            - "'"
+            - "}"
+            - "}"
+  FlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      ResourceId:
+        Ref: TransitVPC
+      ResourceType: VPC
+      TrafficType: ALL
+      DeliverLogsPermissionArn:
+        Fn::GetAtt:
+          - RoleFlowLogs
+          - Arn
+      LogGroupName:
+        Ref: AWS::StackName
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  RoleFlowLogs:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+        Version: "2012-10-17"
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  FlowLogPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogStream
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:CreateLogGroup
+              - logs:DescribeLogGroups
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - LogGroupFlowLogs
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: FlowLogPolicy
+      Roles:
+        - Ref: RoleFlowLogs
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  LogGroupFlowLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Ref: AWS::StackName
+      RetentionInDays:
+        Fn::FindInMap:
+          - LogRetention
+          - Period
+          - Days
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W84
+            reason: CloudWatch logs are encrypted by the service
+  AccessLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W35
+            reason: access logging disabled, its a logging bucket
+  AccessLogBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: AccessLogBucket
+      PolicyDocument:
+        Statement:
+          - Action: "*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+            Effect: Deny
+            Principal: "*"
+            Resource:
+              - Fn::GetAtt:
+                  - AccessLogBucket
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - AccessLogBucket
+                        - Arn
+                    - "/*"
+            Sid: HttpsOnly
+        Version: "2012-10-17"
+Outputs:
+  CSR1:
+    Description: IP Address for CSR1
+    Value:
+      Fn::GetAtt:
+        - VpcCsr1
+        - PublicIp
+  CSR2:
+    Description: IP Address for CSR2
+    Value:
+      Fn::GetAtt:
+        - VpcCsr2
+        - PublicIp
+  ConfigS3Bucket:
+    Description: S3 bucket for storing VPN configuration information.
+    Value:
+      Ref: VPNConfigS3Bucket
+  BucketPrefix:
+    Description: S3 prefix for storing VPN configuration information.
+    Value:
+      Ref: S3Prefix
+  SpokeVPCTag:
+    Description: Tag used to identify spoke VPCs.
+    Value:
+      Ref: SpokeTag
+  SpokeVPCTagValue:
+    Description: Tag valued used to idenfity spoke VPCs.
+    Value:
+      Ref: SpokeTagValue
+  PreferredPathTagName:
+    Description: Tag used to identify the spoke VPC preferred path.
+    Value:
+      Ref: PreferredPathTag
+  UUID:
+    Description: Newly created random UUID.
+    Value:
+      Fn::GetAtt:
+        - CreateUniqueID
+        - UUID
