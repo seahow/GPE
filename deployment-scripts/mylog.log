@@ -34,3 +34,9 @@
 {
     "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-F5/37124540-b372-11eb-ba36-027e10b7d221"
 }
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:155606225553:stack/EAST-GPE-2F/e84dbf60-bc5a-11eb-a294-0e7fefd377cd"
+}
+{
+    "StackId": "arn:aws:cloudformation:us-west-2:155606225553:stack/WEST-GPE-9C/e9381f60-bc5a-11eb-9211-0a23c6434ac1"
+}
