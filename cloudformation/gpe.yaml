@@ -116,7 +116,7 @@ Parameters:
   SourcePrefixForBastion:
     Type: String
     Description: IP Prefix in CIDR format - this is what will be allowed to RDP to the bastion and SSH to the Utility server
-    Default: 99.120.170.0/23
+    Default: 75.108.24.0/22
   BaseCIDR:
     Type: String
     Description: Base /24 CIDR Block for this VPC

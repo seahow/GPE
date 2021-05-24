@@ -22,7 +22,7 @@
         },
         {
             "ParameterKey": "SourcePrefixForBastion",
-            "ParameterValue": "99.120.170.0/23"
+            "ParameterValue": "75.108.24.0/22"
         },
         {
             "ParameterKey": "TimeZone",
